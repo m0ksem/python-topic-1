@@ -1,0 +1,86 @@
+import Metal
+from kernel_source import kernel_source
+from prebuild import pre_build
+import ctypes
+
+# Create a Metal device, library, and kernel function
+device = Metal.MTLCreateSystemDefaultDevice()
+library, error = device.newLibraryWithSource_options_error_(kernel_source, None, None)
+if error:
+  raise RuntimeError(f"Failed to create Metal library: {error}")
+kernel_function = library.newFunctionWithName_("run")
+if not kernel_function:
+  raise RuntimeError("Failed to create kernel function 'run'")
+
+
+def make_kernel(step=1_000_000):
+  array_length = step
+  buffer_length = step * 4  # 4 bytes per float
+
+  cache_size = 10_000
+  cache_buffer_length = cache_size * 4 * 5
+
+  input_buffer = device.newBufferWithLength_options_(buffer_length, Metal.MTLResourceStorageModeShared)
+  output_buffer = device.newBufferWithLength_options_(buffer_length, Metal.MTLResourceStorageModeShared)
+  # cache_buffer = device.newBufferWithLength_options_(cache_buffer_length, Metal.MTLResourceStorageModeShared)
+
+  # Create a command queue
+  commandQueue = device.newCommandQueue()
+
+  # Create a pipeline state object
+  pso = device.newComputePipelineStateWithFunction_error_(kernel_function, None)[0]
+
+  input_array = (ctypes.c_float * array_length).from_buffer(input_buffer.contents().as_buffer(buffer_length))  # Map the Metal buffer to a Python array
+
+  print("Buffers created")
+
+  # cache = pre_build(cache_size, 100_000)
+
+  print("Prebuilt cache")
+
+  # cache_array = (ctypes.c_float * cache_size * 5).from_buffer(cache_buffer.contents().as_buffer(cache_buffer_length))
+
+  # for i in range(0, cache_size):
+  #   cached = cache.get(i, [-1, -1, -1, -1, -1])
+  #   cache_array[i * 5] = cached[0]
+  #   cache_array[i * 5 + 1] = cached[1]
+  #   cache_array[i * 5 + 2] = cached[2]
+  #   cache_array[i * 5 + 3] = cached[3]
+  #   cache_array[i * 5 + 4] = cached[4]
+
+  def run(start, end):
+    if (end - start) > array_length:
+      raise ValueError(f"Input array size {end - start} is too large for buffer size {array_length}")
+
+    # Fill the input array directly
+    for i in range(start, end):
+      input_array[i - start] = i
+
+    # Create a command buffer
+    commandBuffer = commandQueue.commandBuffer()
+
+    # Set the kernel function and buffers
+    computeEncoder = commandBuffer.computeCommandEncoder()
+    computeEncoder.setComputePipelineState_(pso)
+    computeEncoder.setBuffer_offset_atIndex_(input_buffer, 0, 0)
+    computeEncoder.setBuffer_offset_atIndex_(output_buffer, 0, 1)
+    # computeEncoder.setBuffer_offset_atIndex_(cache_buffer, 0, 2)
+
+    print(f"Running kernel for {end - start} numbers")
+
+    # Define threadgroup size
+    threadsPerThreadgroup = Metal.MTLSizeMake(1024, 1, 1)
+    threadgroupSize = Metal.MTLSizeMake((end - start + 1023) // 1024, 1, 1)
+
+    # Dispatch the kernel
+    computeEncoder.dispatchThreads_threadsPerThreadgroup_(threadsPerThreadgroup, threadgroupSize)
+    computeEncoder.endEncoding()
+
+    # Commit the command buffer
+    commandBuffer.commit()
+    commandBuffer.waitUntilCompleted()
+
+    output_data = (ctypes.c_float * array_length).from_buffer(output_buffer.contents().as_buffer(buffer_length))
+    return list(output_data[:end - start])
+
+  return run

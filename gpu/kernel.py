@@ -84,7 +84,7 @@ def make_kernel(step):
     commandBuffer.commit()
     commandBuffer.waitUntilCompleted()
 
-    print(f"Execution time: {time.time() - startTime:.2f} seconds")
+    # print(f"Execution time: {time.time() - startTime:.2f} seconds")
 
     output_data = (ctypes.c_long * output_array_length).from_buffer(output_buffer.contents().as_buffer(output_buffer_length))
     

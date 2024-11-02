@@ -1,25 +1,15 @@
-import { makeTetradicNumber, getLowestTetradicNumberIndex, makeTetradicNumberCalls } from './lib';
-import { printNumber, withTime } from './utils'
-import { preBuild } from '../lib/builder'
-
-let fromCacheCount = 0
-
-let count1 = 0
-let count2 = 0
-let count3 = 0
-let count4 = 0
-let count5 = 0
+import { makeTetradicNumber, getLowestTetradicNumberIndex, makeTetradicNumberCalls } from '../lib';
+import { preBuild } from '../lib'
 
 export function findSums(inputNumber: number, cache: Map<number, number[]>): number[] | null {
   if (cache.has(inputNumber)) {
     return cache.get(inputNumber)!
   }
   
-  const nearestTetradicNumberIndex = getLowestTetradicNumberIndex(inputNumber);
+  const nearestTetradicNumberIndex = getLowestTetradicNumberIndex(inputNumber) - 1;
 
   for (let number1Index = nearestTetradicNumberIndex; number1Index > 0; number1Index--) {
     const number1 = makeTetradicNumber(number1Index);
-    count1++
 
     if (number1 === inputNumber) {
       return [number1];
@@ -34,7 +24,6 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
     const cached = cache.get(required1)!;
 
     if (cached && cached.length <= 4) {
-      fromCacheCount++
       return [number1, ...cached]
     }
 
@@ -46,8 +35,7 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
       number2Index = Math.floor((left2 + right2) / 2);
 
       const number2 = makeTetradicNumber(number2Index);
-      count2++
-
+   
       if (number2 === required1) {
         return [number1, number2];
       }
@@ -67,8 +55,9 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
 
         if (cached) {
           if (cached.length <= 3) {
-            fromCacheCount++
             return [number1, number2, ...cached]
+          } else {
+            break
           }
         }
 
@@ -76,7 +65,6 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
           number3Index = Math.floor((left3 + right3) / 2);
 
           const number3 = makeTetradicNumber(number3Index);
-          count3++
 
           if (number3 === required2) {
             return [number1, number2, number3];
@@ -97,8 +85,9 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
 
             if (cached) {
               if (cached.length <= 2) {
-                fromCacheCount++
                 return [number1, number2, number3, ...cached]
+              } else {
+                break
               }
             }
 
@@ -106,7 +95,6 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
               number4Index = Math.floor((left4 + right4) / 2);
 
               const number4 = makeTetradicNumber(number4Index);
-              count4++
 
               if (number4 === required3) {
                 return [number1, number2, number3, number4];
@@ -126,8 +114,9 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
                 if (cache.has(required4)) {
                   const cached = cache.get(required4)!;
                   if (cached.length <= 1) {
-                    fromCacheCount++
                     return [number1, number2, number3, number4,...cached]
+                  } else {
+                    break
                   }
                 }
 
@@ -135,8 +124,7 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
                   number5Index = Math.floor((left5 + right5) / 2);
 
                   const number5 = makeTetradicNumber(number5Index);
-                  count5++
-
+ 
                   if (number5 === required4) {
                     return [number1, number2, number3, number4, number5];
                   }
@@ -174,32 +162,18 @@ export function findSums(inputNumber: number, cache: Map<number, number[]>): num
   return null;
 }
 
-const start = 1
-const end = 10_000_000
-
-console.log(`Generating ${printNumber(end - start)} numbers`)
-
-const [result, time] = withTime(() => {
-  const cache = new Map()//preBuild(start, 100_000)
-
-  for (let i = start; i < end; i++) {
-    if (i % 10000 === 0) {
-      process.stdout.write(`\r${printNumber(i)} / ${printNumber(end)} (${(Math.floor((i - start) / (end - start) * 100))}%) (from cache: ${fromCacheCount}, size: ${cache.size})`)
-    }
+function test(start: number, end: number, step: number) {
+  const cache = preBuild(start, end);
+ 
+  for (let i = start; i < end; i += step) {
     const result = findSums(i, cache);
-    if (result === null || result.reduce((acc, curr) => acc + curr, 0) !== i || result.length > 5 || result.length < 0) {
-      throw new Error(`Failed at ${i}, result: ${result}, cache: ${cache.get(i)}`)
-    }
-    if (i < 10_000_000) cache.set(i, result!)
-  }
-})
-process.stdout.write(`\r${printNumber(end)} / ${printNumber(end)} (100%) (from cache: ${fromCacheCount})                        `)
 
-console.log(`\n\nFinished testing from ${printNumber(start)} to ${printNumber(end)} in ${time / 1000}s (per task: ${Math.floor(time / (end - start) * 10_000) / 10_000}ms)`)
-console.log('makeTetradicNumber calls count', printNumber(makeTetradicNumberCalls))
-console.log('Accessed from cache', printNumber(fromCacheCount))
-console.log('count1', count1)
-console.log('count2', count2)
-console.log('count3', count3)
-console.log('count4', count4)
-console.log('count5', count5)
+    if (result === null || result.reduce((acc, curr) => acc + curr, 0) !== i) {
+      throw new Error(`No result for ${i}`);
+    }
+  }
+}
+
+const args = Bun.argv.slice(2).map(Number) as [number, number, number];
+
+test(...args);

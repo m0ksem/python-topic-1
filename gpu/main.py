@@ -2,10 +2,10 @@ import time
 from kernel import make_kernel
 
 start = 1
-end = 1_000_000_000
-step = 1_000_000
-# end = 101
-# step = 100
+# end = 10_000_000
+# step = 1_000_000
+end = 1_000_000
+step = int(1000)
 
 run_kernel = make_kernel(step)
 

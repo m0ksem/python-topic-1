@@ -1,7 +1,7 @@
 import time
 import Metal
 from kernel_source import kernel_source
-from prebuild import pre_build
+from prebuild import pre_build, make_tetradic_numbers
 import ctypes
 
 # Create a Metal device, library, and kernel function
@@ -30,7 +30,7 @@ def make_cache_buffer(cache_size):
   # Map the cache to the Metal buffer
   cache_array = (ctypes.c_int * (len(cache) * NUMBERS_IN_CACHE)).from_buffer(cache_buffer.contents().as_buffer(cache_buffer_length))
   for i in range(len(cache)):
-    cached = cache.get(i, [-1, -1, -1, -1, -1])
+    cached = cache.get(i, [-2, -2, -2, -2, -2])
     c = {}
     for j in range(NUMBERS_IN_CACHE):
       cache_array[i * NUMBERS_IN_CACHE + j] = cached[j]
@@ -39,13 +39,26 @@ def make_cache_buffer(cache_size):
 
   return cache_buffer
 
-INT_SIZE = 8
+INT_SIZE = 4
+
+# def make_tetradic_numbers_buffer(num):
+#   numbers = make_tetradic_numbers(num)
+#   numbers_buffer_length = len(numbers) * INT_SIZE  # 4 bytes per float
+#   numbers_buffer = device.newBufferWithLength_options_(numbers_buffer_length, Metal.MTLResourceStorageModeShared)
+
+#   numbers_array = (ctypes.c_int * len(numbers)).from_buffer(numbers_buffer.contents().as_buffer(numbers_buffer_length))
+#   for i in range(len(numbers)):
+#     numbers_array[i] = numbers[i]
+
+#   return numbers_buffer
+
+LONG_INT_SIZE = 8
 
 def make_kernel(step):
   array_length = step
-  input_buffer_length = step * INT_SIZE  # 4 bytes per float
+  input_buffer_length = step * LONG_INT_SIZE
   output_array_length = step * 5
-  output_buffer_length = step * 5 * INT_SIZE  # 4 bytes per float
+  output_buffer_length = step * 5 * LONG_INT_SIZE
 
   input_buffer = device.newBufferWithLength_options_(input_buffer_length, Metal.MTLResourceStorageModeShared)
   output_buffer = device.newBufferWithLength_options_(output_buffer_length, Metal.MTLResourceStorageModeShared)
@@ -84,21 +97,26 @@ def make_kernel(step):
     commandBuffer.commit()
     commandBuffer.waitUntilCompleted()
 
-    # print(f"Execution time: {time.time() - startTime:.2f} seconds")
+    print(f"GPU execution time: {time.time() - startTime:.2f} seconds")
 
     output_data = (ctypes.c_long * output_array_length).from_buffer(output_buffer.contents().as_buffer(output_buffer_length))
     
     # Format the output as a list of lists
     # print(len(output_data))
+    startTime = time.time()
     output_list = []
     for i in range(0, output_array_length, 5):
       # output_list.append([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]])
 
       expected_sum = int(i / 5) + start
+
+      # print([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]], expected_sum)
       
       if sum([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]]) != expected_sum:
           print(f"Error: Expected {expected_sum}, got {[output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]]} ({sum([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]])})")
           break
+
+    print(f"Python validation time: {time.time() - startTime:.2f} seconds")
 
     return output_list
 

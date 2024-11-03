@@ -29,3 +29,16 @@ def pre_build(size, end):
 
     return results
 
+def make_tetradic_numbers(num):
+    numbers = []
+    index = 0
+
+    while True:
+        tetradic_number = make_tetradic_number(index)
+        if tetradic_number > num:
+            break
+
+        numbers.append(tetradic_number)
+        index += 1
+
+    return numbers

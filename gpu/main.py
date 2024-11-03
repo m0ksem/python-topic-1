@@ -2,12 +2,17 @@ import time
 from kernel import make_kernel
 
 start = 1
-# end = 10_000_000
-# step = 1_000_000
-end = 1_000_000
-step = int(1000)
+end = 100_000_001
+step = 100_000_000
+# end = 100_000_001
+# step = int(10_000_000)
+
+if step > end - start:
+    step = end - start
 
 run_kernel = make_kernel(step)
+
+print(f"Processing from {start} to {end} numbers with step {step}.")
 
 start_time = time.time()
 

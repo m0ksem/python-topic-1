@@ -221,11 +221,12 @@ void find_sum(long inputNumber, device long* result, constant int* cache, consta
 }
 
 
-kernel void run(constant long *in  [[ buffer(0) ]],
+kernel void run(constant long &start  [[ buffer(0) ]],
                 device long *out [[ buffer(1) ]],
                 constant int *cache [[ buffer(2) ]],
                 constant long *tetradicNumbers [[ buffer(3) ]],
-                uint index [[ thread_position_in_grid ]]) {
-    // find_sum(in[index], &out[index * 5], cache, tetradicNumbers);
-    out[index * 5 + 0] = in[index];
+                uint id [[ thread_position_in_grid ]]) {
+    uint number = start + id;
+    
+    find_sum(number, &out[id * 5], cache, tetradicNumbers);
 }

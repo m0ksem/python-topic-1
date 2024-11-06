@@ -42,7 +42,7 @@ const workers = [
 
 let doneTasks = 0
 
-const TEN_THOUSAND_INDEX = 100
+const TEN_THOUSAND_INDEX = 200
 
 const preBuild = (end: number) => {
   const results = {} as Record<number, number[]>
@@ -51,7 +51,7 @@ const preBuild = (end: number) => {
   for (let i = 1; i <= TEN_THOUSAND_INDEX; i++) {
     const number1 = makeTetradicNumber(i)
    
-    for (let j = 1; j <= TEN_THOUSAND_INDEX; j++) {
+    for (let j = 1; j <= TEN_THOUSAND_INDEX / 2; j++) {
       const number2 = makeTetradicNumber(j)
       const sum = number1 + number2
       
@@ -59,14 +59,14 @@ const preBuild = (end: number) => {
         break
       }
 
-      for (let k = 1; k <= TEN_THOUSAND_INDEX; k++) {
+      for (let k = 1; k <= TEN_THOUSAND_INDEX / 3; k++) {
         const number3 = makeTetradicNumber(k)
         const sum = number1 + number2 + number3
         
         if (sum > end) {
           break
         }
-  
+
         results[sum] = [number1, number2, number3]
       }
 

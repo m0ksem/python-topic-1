@@ -1,7 +1,6 @@
 export let makeTetradicNumberCalls = 0
 
 export function makeTetradicNumber(index: number): number {
-  makeTetradicNumberCalls++
   return (index * (index + 1) * (index + 2)) / 6;
 }
 

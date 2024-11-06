@@ -17,8 +17,14 @@ function getTetradicNumberIndex(y: number): number {
 function findSums(
   inputNumber: number,
   tetradicNumbers: number[],
-  cache: Record<number, number[]>
+  preBuiltArray: Record<number, number[]>
 ): number[] | null {
+  const prebuilt = preBuiltArray[(inputNumber)];
+
+  if (prebuilt) {
+    return prebuilt;
+  }
+
   for (let number1Index = getTetradicNumberIndex(inputNumber); number1Index > 0; number1Index--) {
     const number1 = tetradicNumbers[number1Index];
  
@@ -28,13 +34,13 @@ function findSums(
       continue
     }
 
-    const cached = cache[(required1)];
+    const prebuilt = preBuiltArray[(required1)];
 
-    if (cached) {
-      if (cached.length > 4) {
+    if (prebuilt) {
+      if (prebuilt.length > 4) {
         break
       }
-      return [number1, cached[0], cached[1] ?? 0, cached[2] ?? 0, cached[3] ?? 0, cached[4] ?? 0];
+      return [number1, prebuilt[0], prebuilt[1] ?? 0, prebuilt[2] ?? 0, prebuilt[3] ?? 0, prebuilt[4] ?? 0];
     }
 
     if (number1 === inputNumber) {
@@ -57,13 +63,13 @@ function findSums(
       if (required1 > number2) { 
         const required2 = required1 - number2;
 
-        const cached = cache[(required2)];
+        const prebuilt = preBuiltArray[(required2)];
 
-        if (cached) {
-          if (cached.length > 3) {
+        if (prebuilt) {
+          if (prebuilt.length > 3) {
             break
           }
-          return [number1, number2, cached[0], cached[1] ?? 0, cached[2] ?? 0];
+          return [number1, number2, prebuilt[0], prebuilt[1] ?? 0, prebuilt[2] ?? 0];
         }
 
         left2 = number2Index + 1;
@@ -84,7 +90,7 @@ function findSums(
           if (required2 > number3) {
             const required3 = required2 - number3;
 
-            const cached = cache[(required3)];
+            const cached = preBuiltArray[(required3)];
 
             if (cached) {
               if (cached.length > 2) {
@@ -111,13 +117,13 @@ function findSums(
               if (required3 > number4) {
                 const required4 = required3 - number4;
 
-                const cached = cache[(required4)];
+                const prebuilt = preBuiltArray[(required4)];
 
-                if (cached) {
-                  if (cached.length > 1) {
+                if (prebuilt) {
+                  if (prebuilt.length > 1) {
                     break
                   } 
-                  return [number1, number2, number3, number4, cached[0]];
+                  return [number1, number2, number3, number4, prebuilt[0]];
                 }
 
                 left4 = number4Index + 1;

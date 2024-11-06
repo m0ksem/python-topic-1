@@ -73,7 +73,7 @@ const config = {
     // { name: 'binary-search-pre', start: 1, end: 100_000_000, step: 0 },
     // { name: 'binary-search-prebuild-skip-gbc', start: 100_000_000, end: 110_000_000, step: 0 },    
     // { name: 'binary-search-prebuild-skip', start: 1, end: 100_000_000, step: 0 },  
-    { name: 'multithread', start: 1, end: 1_000_000_000, step: 10_000_000, timeout: 10 },    
+    { name: 'multithread', start: 1_000_000_000, end: 1_100_000_000, step: 10_000_000, timeout: 10 },    
 
 
     // { name: 'simple', start: 1, end: 10_000, step: 0 },

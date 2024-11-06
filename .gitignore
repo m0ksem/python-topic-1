@@ -2,3 +2,4 @@ node_modules
 main
 out
 .DS_Store
+__pycache__

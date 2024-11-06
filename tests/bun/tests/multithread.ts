@@ -81,6 +81,8 @@ const preBuild = (end: number) => {
 }
 
 function test(start: number, end: number, step: number) {
+  const startTime = Date.now()
+
   return new Promise((resolve, reject) => {
     const tetradicNumbers = makeTetradicNumbers(end);
     const cache = preBuild(end);
@@ -90,10 +92,13 @@ function test(start: number, end: number, step: number) {
     workers.forEach(worker => {
       worker.addEventListener('message', (event: any) => {
         doneTasks++
+
+        process.stdout.write(`\rTested from ${event.data.start} to ${event.data.end} (done ${doneTasks} of ${tasksCount})`)
     
         if (doneTasks === tasksCount) {
           workers.forEach(worker => worker.terminate())
           resolve(doneTasks)
+          console.log('Time:', Date.now() - startTime)
         } else {
           worker.postMessage({
             start: event.data.end + step,

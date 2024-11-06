@@ -112,7 +112,7 @@ def make_kernel(step):
           print(f"Error: Expected {expected_sum}, got {[output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]]} ({sum(output_data[i: i + 5])}")
           break
 
-    # print(f"Python validation time: {time.time() - startTime:.2f} seconds")
+    print(f"Python validation time: {time.time() - startTime:.2f} seconds")
 
     return output_list
 

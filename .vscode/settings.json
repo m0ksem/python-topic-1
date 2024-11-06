@@ -13,6 +13,7 @@
     "variant": "cpp",
     "__locale": "cpp",
     "locale": "cpp",
-    "ios": "cpp"
+    "ios": "cpp",
+    "string_view": "cpp"
   }
 }

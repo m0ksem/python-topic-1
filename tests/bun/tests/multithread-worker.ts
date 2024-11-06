@@ -1,68 +1,25 @@
 import { makeTetradicNumber } from '../lib';
 
-const makeTetradicNumbers = (num: number) => {
-  const numbers = []
-  let index = 0
 
-  while (true) {
-    const tetradicNumber = makeTetradicNumber(index);
-    if (tetradicNumber > num) {
-      break;
-    }
+const ONE_THIRD = 1 / 3;
+const MINUS_ONE_THIRD_CUBE = Math.pow(-ONE_THIRD, 3);
 
-    numbers.push(tetradicNumber);
-    index++
-  }
+function getTetradicNumberIndex(y: number): number {
+  const halfD = -3 * y;
+  const discriminantSqrt = Math.sqrt((halfD ** 2) + MINUS_ONE_THIRD_CUBE);
 
-  return numbers;
+  const offsetD = -halfD;
+  const u = Math.cbrt(offsetD + discriminantSqrt);
+  const v = Math.cbrt(offsetD - discriminantSqrt);
+  return Math.round(u + v - 1);
 }
 
-
-const TEN_THOUSAND_INDEX = 100
-
-const preBuild = (end: number) => {
-  const results = new Map<number, number[]>()
-
-  // Prebuild small numbers, because they repeat frequently
-  for (let i = 1; i <= TEN_THOUSAND_INDEX; i++) {
-    const number1 = makeTetradicNumber(i)
-   
-    for (let j = 1; j <= TEN_THOUSAND_INDEX; j++) {
-      const number2 = makeTetradicNumber(j)
-      const sum = number1 + number2
-      
-      if (sum > end) {
-        break
-      }
-
-      for (let k = 1; k <= TEN_THOUSAND_INDEX; k++) {
-        const number3 = makeTetradicNumber(k)
-        const sum = number1 + number2 + number3
-        
-        if (sum > end) {
-          break
-        }
-  
-        results.set(sum, [number1, number2, number3])
-      }
-
-      results.set(sum, [number1, number2])
-    }
-
-    results.set(number1, [number1])
-  }
-
-  return results
-}
-
-export function findSums(
+function findSums(
   inputNumber: number,
   tetradicNumbers: number[],
-  cache: Map<number, number[]>
+  cache: Record<number, number[]>
 ): number[] | null {
-  const length = tetradicNumbers.length;
-
-  for (let number1Index = length - 1; number1Index > 0; number1Index--) {
+  for (let number1Index = getTetradicNumberIndex(inputNumber); number1Index > 0; number1Index--) {
     const number1 = tetradicNumbers[number1Index];
  
     const required1 = inputNumber - number1;
@@ -71,14 +28,13 @@ export function findSums(
       continue
     }
 
-    const cached = cache.get(required1);
+    const cached = cache[(required1)];
 
     if (cached) {
-      if (cached.length <= 4) {
-        return [number1, ...cached];
-      } else {
+      if (cached.length > 4) {
         break
       }
+      return [number1, cached[0], cached[1] ?? 0, cached[2] ?? 0, cached[3] ?? 0, cached[4] ?? 0];
     }
 
     if (number1 === inputNumber) {
@@ -98,56 +54,50 @@ export function findSums(
         return [number1, number2];
       }
 
-      if (number2 < required1) {
+      if (required1 > number2) { 
         const required2 = required1 - number2;
 
-        if (required2 < 0) {
-          continue
-        }
-
-        const cached = cache.get(required2);
+        const cached = cache[(required2)];
 
         if (cached) {
-          if (cached.length <= 3) {
-            return [number1, number2, ...cached];
-          } else {
+          if (cached.length > 3) {
             break
           }
+          return [number1, number2, cached[0], cached[1] ?? 0, cached[2] ?? 0];
         }
 
+        left2 = number2Index + 1;
+
         let left3 = 0;
-        let right3 = number2Index + 1;
+        let right3 = left2;
         let number3Index;
 
         while (left3 <= right3) {
           number3Index = Math.floor((left3 + right3) / 2);
 
-          const number3 = tetradicNumbers[number3Index];
+          const number3 = makeTetradicNumber(number3Index);
 
           if (number3 === required2) {
             return [number1, number2, number3];
           }
 
-          if (number3 < required2) {
-            let left4 = 0;
-            let right4 = number3Index + 1;
-            let number4Index;
-
+          if (required2 > number3) {
             const required3 = required2 - number3;
 
-            if (required3 < 0) {
-              continue
-            }
-
-            const cached = cache.get(required3);
+            const cached = cache[(required3)];
 
             if (cached) {
-              if (cached.length <= 2) {
-                return [number1, number2, number3, ...cached];
-              } else {
+              if (cached.length > 2) {
                 break
               }
+              return [number1, number2, number3, cached[0], cached[1] ?? 0];
             }
+
+            left3 = number3Index + 1;
+
+            let left4 = 0;
+            let right4 = left3;
+            let number4Index;
 
             while (left4 <= right4) {
               number4Index = Math.floor((left4 + right4) / 2);
@@ -158,26 +108,23 @@ export function findSums(
                 return [number1, number2, number3, number4];
               }
 
-              if (number4 < required3) {
-                let left5 = 0;
-                let right5 = number4Index + 1;
-                let number5Index;
-
+              if (required3 > number4) {
                 const required4 = required3 - number4;
 
-                if (required4 < 0) {
-                  continue
-                }
-
-                const cached = cache.get(required4);
+                const cached = cache[(required4)];
 
                 if (cached) {
-                  if (cached.length <= 1) {
-                    return [number1, number2, number3, number4, ...cached];
-                  } else {
+                  if (cached.length > 1) {
                     break
-                  }
+                  } 
+                  return [number1, number2, number3, number4, cached[0]];
                 }
+
+                left4 = number4Index + 1;
+
+                let left5 = 0;
+                let right5 = left4;
+                let number5Index;
 
                 while (left5 <= right5) {
                   number5Index = Math.floor((left5 + right5) / 2);
@@ -188,30 +135,20 @@ export function findSums(
                     return [number1, number2, number3, number4, number5];
                   }
 
-                  if (number5 < required4) {
+                  if (required4 > number5) {
                     left5 = number5Index + 1;
                   } else {
                     right5 = number5Index - 1;
                   }
                 }
-
-                left4 = number4Index + 1;
               } else {
                 right4 = number4Index - 1;
               }
             }
-
-          }
-
-          if (number3 < required2) {
-            left3 = number3Index + 1;
           } else {
             right3 = number3Index - 1;
           }
         }
-
-
-        left2 = number2Index + 1;
       } else {
         right2 = number2Index - 1;
       }
@@ -225,15 +162,26 @@ export function findSums(
 declare var self: Worker;
 
 self.onmessage = (event: MessageEvent) => {
-  // const results = new Map<number, number[]>()
   const results = [] as number[][]
   const { start, end } = event.data
 
   for (let i = start; i <= end; i++) {
     const result = findSums(i, event.data.tetradicNumbers, event.data.cache)
     
-    if (result === null || result.reduce((acc, curr) => acc + curr, 0) !== i) {
+    if (result === null) {
+      postMessage({ error: 'Failed at ' + i });
       throw new Error('Failed at ' + i)
+    }
+
+    let sum = 0
+
+    for (let j = 0; j < result.length; j++) {
+      sum += result[j]
+    }
+
+    if (sum !== i) {
+      postMessage({ error: 'Failed at ' + i + ' sum is incorrect (' + sum + ')' });
+      throw new Error('Failed at ' + i + ' sum is incorrect (' + sum + ')')
     }
   }
 

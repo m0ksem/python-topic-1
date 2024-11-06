@@ -6,12 +6,14 @@ export const printNumber = (n: number) => {
 
 const results = [] as { testName: string, range: string, time: string }[]
 
-const runTest = (testName: string, start: number, end: number, step: number) => {
+const runTest = (testName: string, start: number, end: number, step: number, timeoutInMins = 2) => {
   return new Promise((resolve, reject) => {
     const startMs = new Date().getTime();
     const command = `bun run tests/${testName}.ts ${start} ${end} ${step}`;
 
     let timeout: ReturnType<typeof setTimeout>;
+
+    console.log(`Testing ${testName} from ${printNumber(start)} to ${printNumber(end)} with step ${printNumber(step)}`);
 
     const process = exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -20,10 +22,6 @@ const runTest = (testName: string, start: number, end: number, step: number) => 
         clearTimeout(timeout);
         resolve(false);
         return;
-      }
-
-      if (stdout) {
-        console.log(stdout);
       }
 
       const endMs = new Date().getTime();
@@ -50,7 +48,7 @@ const runTest = (testName: string, start: number, end: number, step: number) => 
       process.kill()
       console.error(`Timeout for ${testName} ${start} - ${end} ${step}`)
       resolve(true)
-    }, 1000 * 60 * 2)
+    }, 1000 * 60 * timeoutInMins)
   })
 }
 
@@ -75,7 +73,7 @@ const config = {
     // { name: 'binary-search-pre', start: 1, end: 100_000_000, step: 0 },
     // { name: 'binary-search-prebuild-skip-gbc', start: 100_000_000, end: 110_000_000, step: 0 },    
     // { name: 'binary-search-prebuild-skip', start: 1, end: 100_000_000, step: 0 },  
-    { name: 'multithread', start: 1, end: 10_000_000_000, step: 10_000_000 },    
+    { name: 'multithread', start: 1, end: 1_000_000_000, step: 10_000_000, timeout: 10 },    
 
 
     // { name: 'simple', start: 1, end: 10_000, step: 0 },
@@ -119,7 +117,7 @@ const config = {
 const run = async () => {
   for (let i = 0; i < config.bun.length; i++) {
     const test = config.bun[i];
-    await runTest(test.name, test.start, test.end, test.step)
+    await runTest(test.name, test.start, test.end, test.step, test.timeout)
   }
 
   console.table(results)

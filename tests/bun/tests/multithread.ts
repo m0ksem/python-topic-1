@@ -1,7 +1,6 @@
+import { printNumber } from './../../../bun/perfomance-tests/utils';
 import { makeTetradicNumber } from '../lib';
 import { dirname, resolve } from 'path'
-
-let fromCacheCount = 0
 
 const makeWorker = () => {
   const worker = new Worker(resolve(dirname(import.meta.path), "./multithread-worker.ts"));
@@ -46,12 +45,12 @@ let doneTasks = 0
 const TEN_THOUSAND_INDEX = 100
 
 const preBuild = (end: number) => {
-  const results = new Map<number, number[]>()
+  const results = {} as Record<number, number[]>
 
   // Prebuild small numbers, because they repeat frequently
   for (let i = 1; i <= TEN_THOUSAND_INDEX; i++) {
     const number1 = makeTetradicNumber(i)
-    
+   
     for (let j = 1; j <= TEN_THOUSAND_INDEX; j++) {
       const number2 = makeTetradicNumber(j)
       const sum = number1 + number2
@@ -68,13 +67,13 @@ const preBuild = (end: number) => {
           break
         }
   
-        results.set(sum, [number1, number2, number3])
+        results[sum] = [number1, number2, number3]
       }
 
-      results.set(sum, [number1, number2])
+      results[sum] = [number1, number2]
     }
 
-    results.set(number1, [number1])
+    results[number1] = [number1]
   }
 
   return results
@@ -88,35 +87,46 @@ function test(start: number, end: number, step: number) {
     const cache = preBuild(end);
   
     const tasksCount = Math.ceil((end - start) / step)
+    let startedTasks = 0
   
     workers.forEach(worker => {
       worker.addEventListener('message', (event: any) => {
+        if ('error' in event.data) {
+          console.error(event.data.error)
+          process.exit(1)
+        }
+
         doneTasks++
 
-        process.stdout.write(`\rTested from ${event.data.start} to ${event.data.end} (done ${doneTasks} of ${tasksCount})`)
-    
         if (doneTasks === tasksCount) {
           workers.forEach(worker => worker.terminate())
           resolve(doneTasks)
           console.log('Time:', Date.now() - startTime)
-        } else {
+          process.exit(0)
+        } else if (startedTasks < tasksCount) {
           worker.postMessage({
-            start: event.data.end + step,
-            end: Math.min(event.data.end + step * 2, end),
+            start: start + startedTasks * step,
+            end: start + Math.min(startedTasks * step + step, end),
             cache,
             tetradicNumbers
           })
+          startedTasks++
         }
       })
     })
     
-    workers.forEach((worker, i) => {
+    workers.forEach((worker) => {
+      if (startedTasks >= tasksCount) {
+        return
+      }
+
       worker.postMessage({
-        start: start + i * step,
-        end: start + Math.min(i * step + step, end),
+        start: start + startedTasks * step,
+        end: start + Math.min(startedTasks * step + step, end),
         cache,
         tetradicNumbers
       })
+      startedTasks++
     })
   })
 }

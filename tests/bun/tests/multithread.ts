@@ -1,9 +1,7 @@
-import { printNumber } from './../../../bun/perfomance-tests/utils';
 import { makeTetradicNumber } from '../lib';
-import { dirname, resolve } from 'path'
 
 const makeWorker = () => {
-  const worker = new Worker(resolve(dirname(import.meta.path), "./multithread-worker.ts"));
+  const worker = new Worker("./multithread-worker.ts");
 
   worker.onerror = event => {
     console.error(event);

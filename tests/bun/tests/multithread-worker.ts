@@ -24,6 +24,10 @@ function findSums(
 
   let number1Index = getTetradicNumberIndex(inputNumber)
 
+  let left2;
+  let right2
+  let number2Index;
+
   for (; number1Index > 0; number1Index--) {
     const number1 = tetradicNumbers[number1Index];
  
@@ -46,9 +50,9 @@ function findSums(
       return [number1];
     }
 
-    let left2 = 0;
-    let right2 = number1Index + 1;
-    let number2Index;
+    left2 = 0;
+    right2 = number1Index + 1;
+    number2Index;
 
     while (left2 <= right2) {
       number2Index = Math.floor((left2 + right2) / 2);
@@ -168,10 +172,11 @@ declare var self: Worker;
 
 self.onmessage = (event: MessageEvent) => {
   const results = [] as number[][]
-  const { start, end } = event.data
+  const { start, end, cache } = event.data
+  // const cache = preBuild(start, end)
 
   for (let i = start; i <= end; i++) {
-    const result = findSums(i, event.data.tetradicNumbers, event.data.cache)
+    const result = findSums(i, event.data.tetradicNumbers, cache)
     
     if (result === null) {
       postMessage({ error: 'Failed at ' + i });

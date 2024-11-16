@@ -10,8 +10,8 @@
 #include <thread>
 
 const int start = 1;
-const int end = 200000000;
-const int step = 20000000;
+const int end = 100000000;
+const int step = 1000000;
 
 std::string printNumber(int number) {
   return std::to_string(number);

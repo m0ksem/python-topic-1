@@ -42,11 +42,10 @@ const workers = [
 
 let doneTasks = 0
 
-const TEN_THOUSAND_INDEX = 200
+const TEN_THOUSAND_INDEX = 150
 
 const preBuild = (end: number) => {
   const results = {} as Record<number, number[]>
-
   // Prebuild small numbers, because they repeat frequently
   for (let i = 1; i <= TEN_THOUSAND_INDEX; i++) {
     const number1 = makeTetradicNumber(i)

@@ -54,18 +54,17 @@ def make_tetradic_numbers_buffer(max_index):
 cache_buffer = make_cache_buffer(10000)
 tetradic_numbers = make_tetradic_numbers_buffer(1000)
 
-def make_kernel(step):
-  array_length = step
-  output_array_length = step * 5
-  output_buffer_length = step * 5 * LONG_INT_SIZE
+class Kernel:
+  def __init__(self, step):
+    self.step = step
+    self.array_length = step
+    self.output_array_length = step * 5
+    self.output_buffer_length = step * 5 * LONG_INT_SIZE
 
-  print(f"Array length: {array_length}", f"Output array length: {output_array_length}")
-
-  output_buffer = device.newBufferWithLength_options_(output_buffer_length, Metal.MTLResourceStorageModeShared)
-
-  def run(start, end):
-    if (end - start) > array_length:
-      raise ValueError(f"Input array size {end - start} is too large for buffer size {array_length}")
+  def run(self, start, end):
+    self.output_buffer = device.newBufferWithLength_options_(self.output_buffer_length, Metal.MTLResourceStorageModeShared)
+    if (end - start) > self.array_length:
+      raise ValueError(f"Input array size {end - start} is too large for buffer size {self.array_length}")
 
 
     # Create a command buffer
@@ -76,12 +75,12 @@ def make_kernel(step):
     computeEncoder.setComputePipelineState_(pso)
     start_c_long = ctypes.c_long(start)
     computeEncoder.setBytes_length_atIndex_(start_c_long, LONG_INT_SIZE, 0)
-    computeEncoder.setBuffer_offset_atIndex_(output_buffer, 0, 1)
+    computeEncoder.setBuffer_offset_atIndex_(self.output_buffer, 0, 1)
     computeEncoder.setBuffer_offset_atIndex_(cache_buffer, 0, 2)
     computeEncoder.setBuffer_offset_atIndex_(tetradic_numbers, 0, 3)
 
     # Define thread group size
-    threadsPerThreadGroup = Metal.MTLSizeMake(array_length, 1, 1)
+    threadsPerThreadGroup = Metal.MTLSizeMake(self.array_length, 1, 1)
     threadGroupSize = Metal.MTLSizeMake(pso.maxTotalThreadsPerThreadgroup(), 1, 1)
 
     # Dispatch the kernel
@@ -95,13 +94,13 @@ def make_kernel(step):
 
     print(f"GPU execution time: {time.time() - startTime:.2f} seconds")
 
-    output_data = (ctypes.c_long * output_array_length).from_buffer(output_buffer.contents().as_buffer(output_buffer_length))
+    output_data = (ctypes.c_long * self.output_array_length).from_buffer(self.output_buffer.contents().as_buffer(self.output_buffer_length))
     
     # Format the output as a list of lists
     # print(len(output_data))
     startTime = time.time()
     output_list = []
-    for i in range(0, output_array_length, 5):
+    for i in range(0, self.output_array_length, 5):
       # output_list.append([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]])
 
       expected_sum = int(i / 5) + start
@@ -116,4 +115,66 @@ def make_kernel(step):
 
     return output_list
 
-  return run
+# def make_kernel(step):
+#   array_length = step
+#   output_array_length = step * 5
+#   output_buffer_length = step * 5 * LONG_INT_SIZE
+
+#   print(f"Array length: {array_length}", f"Output array length: {output_array_length}")
+
+#   output_buffer = device.newBufferWithLength_options_(output_buffer_length, Metal.MTLResourceStorageModeShared)
+
+#   def run(start, end):
+#     if (end - start) > array_length:
+#       raise ValueError(f"Input array size {end - start} is too large for buffer size {array_length}")
+
+
+#     # Create a command buffer
+#     commandBuffer = commandQueue.commandBuffer()
+
+#     # Set the kernel function and buffers
+#     computeEncoder = commandBuffer.computeCommandEncoder()
+#     computeEncoder.setComputePipelineState_(pso)
+#     start_c_long = ctypes.c_long(start)
+#     computeEncoder.setBytes_length_atIndex_(start_c_long, LONG_INT_SIZE, 0)
+#     computeEncoder.setBuffer_offset_atIndex_(output_buffer, 0, 1)
+#     computeEncoder.setBuffer_offset_atIndex_(cache_buffer, 0, 2)
+#     computeEncoder.setBuffer_offset_atIndex_(tetradic_numbers, 0, 3)
+
+#     # Define thread group size
+#     threadsPerThreadGroup = Metal.MTLSizeMake(array_length, 1, 1)
+#     threadGroupSize = Metal.MTLSizeMake(pso.maxTotalThreadsPerThreadgroup(), 1, 1)
+
+#     # Dispatch the kernel
+#     computeEncoder.dispatchThreads_threadsPerThreadgroup_(threadsPerThreadGroup, threadGroupSize)
+#     computeEncoder.endEncoding()
+
+#     startTime = time.time()  # Removed unused variable
+#     # Commit the command buffer
+#     commandBuffer.commit()
+#     commandBuffer.waitUntilCompleted()
+
+#     print(f"GPU execution time: {time.time() - startTime:.2f} seconds")
+
+#     output_data = (ctypes.c_long * output_array_length).from_buffer(output_buffer.contents().as_buffer(output_buffer_length))
+    
+#     # Format the output as a list of lists
+#     # print(len(output_data))
+#     startTime = time.time()
+#     output_list = []
+#     for i in range(0, output_array_length, 5):
+#       # output_list.append([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]])
+
+#       expected_sum = int(i / 5) + start
+
+#       # print([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]])
+
+#       if sum(output_data[i: i + 5]) != expected_sum:
+#           print(f"Error: Expected {expected_sum}, got {[output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]]} ({sum(output_data[i: i + 5])}")
+#           break
+
+#     print(f"Python validation time: {time.time() - startTime:.2f} seconds")
+
+#     return output_list
+
+#   return run

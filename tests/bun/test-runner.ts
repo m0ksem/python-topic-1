@@ -60,7 +60,7 @@ const config = {
     // { name: 'half-reversed-2', start: 1, end: 10_000, step: 0 },
     // { name: 'half-reversed-3', start: 1, end: 10_000, step: 0 },
     // { name: 'binary-search', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search-pre', start: 1, end: 10_000, step: 0 },
+    // { name: 'binary-search-pre', start: 1, end: 10_000, step: 0 },
     // { name: 'binary-search-cache', start: 1, end: 10_000, step: 0 },
     // { name: 'binary-search-formula', start: 1, end: 10_000, step: 0 },
     // { name: 'binary-search-prebuild', start: 1, end: 10_000, step: 0 },
@@ -71,7 +71,7 @@ const config = {
     // { name: 'reversed', start: 1, end: 100_000, step: 0 },
     // { name: 'half-reversed-2', start: 1, end: 100_000, step: 0 },
     // { name: 'binary-search', start: 1, end: 100_000, step: 0 },
-    { name: 'binary-search-pre', start: 1, end: 100_000, step: 0 },
+    // { name: 'binary-search-pre', start: 1, end: 100_000, step: 0 },
     // { name: 'binary-search-cache', start: 1, end: 100_000, step: 0 },
     // { name: 'binary-search-formula', start: 1, end: 100_000, step: 0 },
     // { name: 'binary-search-prebuild', start: 1, end: 100_000, step: 0 },
@@ -97,7 +97,7 @@ const config = {
 
     // 100_000_000
     // { name: 'binary-search-prebuild', start: 1, end: 100_000_000, step: 0 },
-    // { name: 'multithread', start: 1, end: 100_000_000, step: 10_000_000 },
+    { name: 'multithread', start: 1, end: 100_000_000, step: 10_000_000 },
 
     // 200_000_000
     // { name: 'multithread', start: 1, end: 200_000_000, step: 20_000_000 },

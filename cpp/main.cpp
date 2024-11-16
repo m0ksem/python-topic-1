@@ -3,12 +3,13 @@
 #include <unordered_map>
 #include <chrono>
 #include <iomanip>
+#include <numeric>
 #include "tetradic.cpp"
 #include "find_sum.cpp"
 #include "builder.cpp"
 
 const int start = 1;
-const int end = 10000000;
+const int end = 1000000;
 
 std::string printNumber(int number) {
   return std::to_string(number);
@@ -30,16 +31,10 @@ int main() {
     int fromCacheCount = 0;
 
     for (int i = start; i < end; ++i) {
-      if (i % 10000 == 0) {
-        std::cout << "\r" << printNumber(i) << " / " << printNumber(end) << " (" 
-              << (std::floor((i - start) / static_cast<double>(end - start) * 100)) << "%) "
-              << "(from cache: " << fromCacheCount << ", size: " << cache.size() << ")";
-      }
-      auto result = findSums(i, cache);
+      auto result = findSum(i, cache);
       if (result.empty() || std::accumulate(result.begin(), result.end(), 0) != i || result.size() > 5 || result.size() < 0) {
         throw std::runtime_error("Failed at " + std::to_string(i) + ", result: " + printNumber(result.size()) + ", cache: " + printNumber(cache.size()));
       }
-      cache[i] = result;
     }
   });
 

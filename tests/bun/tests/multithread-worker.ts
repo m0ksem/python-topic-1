@@ -1,6 +1,3 @@
-import { makeTetradicNumber } from '../lib';
-
-
 const ONE_THIRD = 1 / 3;
 const MINUS_ONE_THIRD_CUBE = Math.pow(-ONE_THIRD, 3);
 
@@ -19,13 +16,15 @@ function findSums(
   tetradicNumbers: number[],
   preBuiltArray: Record<number, number[]>
 ): number[] | null {
-  const prebuilt = preBuiltArray[(inputNumber)];
+  let prebuilt = preBuiltArray[(inputNumber)];
 
   if (prebuilt) {
     return prebuilt;
   }
 
-  for (let number1Index = getTetradicNumberIndex(inputNumber); number1Index > 0; number1Index--) {
+  let number1Index = getTetradicNumberIndex(inputNumber)
+
+  for (; number1Index > 0; number1Index--) {
     const number1 = tetradicNumbers[number1Index];
  
     const required1 = inputNumber - number1;
@@ -34,13 +33,13 @@ function findSums(
       continue
     }
 
-    const prebuilt = preBuiltArray[(required1)];
+    prebuilt = preBuiltArray[(required1)];
 
     if (prebuilt) {
       if (prebuilt.length > 4) {
         break
       }
-      return [number1, prebuilt[0], prebuilt[1] ?? 0, prebuilt[2] ?? 0, prebuilt[3] ?? 0, prebuilt[4] ?? 0];
+      return [number1, prebuilt[0], prebuilt[1] ?? 0, prebuilt[2] ?? 0, prebuilt[3] ?? 0];
     }
 
     if (number1 === inputNumber) {
@@ -63,7 +62,7 @@ function findSums(
       if (required1 > number2) { 
         const required2 = required1 - number2;
 
-        const prebuilt = preBuiltArray[(required2)];
+        prebuilt = preBuiltArray[(required2)];
 
         if (prebuilt) {
           if (prebuilt.length > 3) {
@@ -81,7 +80,7 @@ function findSums(
         while (left3 <= right3) {
           number3Index = Math.floor((left3 + right3) / 2);
 
-          const number3 = makeTetradicNumber(number3Index);
+          const number3 = tetradicNumbers[number3Index];
 
           if (number3 === required2) {
             return [number1, number2, number3];
@@ -90,13 +89,13 @@ function findSums(
           if (required2 > number3) {
             const required3 = required2 - number3;
 
-            const cached = preBuiltArray[(required3)];
+            prebuilt = preBuiltArray[(required3)];
 
-            if (cached) {
-              if (cached.length > 2) {
+            if (prebuilt) {
+              if (prebuilt.length > 2) {
                 break
               }
-              return [number1, number2, number3, cached[0], cached[1] ?? 0];
+              return [number1, number2, number3, prebuilt[0], prebuilt[1] ?? 0];
             }
 
             left3 = number3Index + 1;
@@ -117,7 +116,7 @@ function findSums(
               if (required3 > number4) {
                 const required4 = required3 - number4;
 
-                const prebuilt = preBuiltArray[(required4)];
+                prebuilt = preBuiltArray[(required4)];
 
                 if (prebuilt) {
                   if (prebuilt.length > 1) {

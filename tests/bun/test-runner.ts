@@ -6,7 +6,7 @@ export const printNumber = (n: number) => {
 
 const results = [] as { testName: string, range: string, time: string }[]
 
-const runTest = (testName: string, start: number, end: number, step: number, timeoutInMins = 2) => {
+const runTest = (testName: string, start: number, end: number, step: number, timeoutInMins = 0.5) => {
   return new Promise((resolve, reject) => {
     const startMs = new Date().getTime();
     const command = `bun run tests/${testName}.ts ${start} ${end} ${step}`;
@@ -54,64 +54,52 @@ const runTest = (testName: string, start: number, end: number, step: number, tim
 
 const config = {
   bun: [
-    // { name: 'half-reversed-2', start: 1, end: 100_000, step: 0 },
-    // { name: 'pre-build', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'half-reversed-2', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'pre-build', start: 1, end: 100_000_000_000_000, step: 0 },
-    // { name: 'binary-search-pre', start: 1, end: 10_000_000, step: 0 },
-    // { name: 'binary-search-pre', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search-cache', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search-horizontal', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search-horizontal-cache', start: 1, end: 1_000_000, step: 0 },
-
-    // { name: 'binary-search-pre', start: 1, end: 10_000_000, step: 0 },
-    // { name: 'binary-search-prebuild', start: 1, end: 10_000_000, step: 0 },
-
-
-    // { name: 'binary-search-pre', start: 1, end: 100_000_000, step: 0 },
-    // { name: 'binary-search-prebuild-skip-gbc', start: 100_000_000, end: 110_000_000, step: 0 },    
-    // { name: 'binary-search-prebuild-skip', start: 1, end: 100_000_000, step: 0 },  
-    { name: 'multithread', start: 1_000_000_000, end: 1_100_000_000, step: 10_000_000, timeout: 10 },    
-
-
+    // 10_000
     // { name: 'simple', start: 1, end: 10_000, step: 0 },
     // { name: 'reversed', start: 1, end: 10_000, step: 0 },
     // { name: 'half-reversed-2', start: 1, end: 10_000, step: 0 },
     // { name: 'half-reversed-3', start: 1, end: 10_000, step: 0 },
+    // { name: 'binary-search', start: 1, end: 10_000, step: 0 },
+    // { name: 'binary-search-cache', start: 1, end: 10_000, step: 0 },
+    // { name: 'binary-search-formula', start: 1, end: 10_000, step: 0 },
+    // { name: 'binary-search-prebuild', start: 1, end: 10_000, step: 0 },
+    // { name: 'multithread', start: 1, end: 10_000, step: 1_000 },
 
+    // // 100_000
     // { name: 'simple', start: 1, end: 100_000, step: 0 },
     // { name: 'reversed', start: 1, end: 100_000, step: 0 },
-    // { name: 'half-reversed-3', start: 1, end: 100_000, step: 0 },
-    // { name: 'recursive', start: 1, end: 100_000, step: 10_000 },
-    // { name: 'for', start: 1, end: 100_000, step: 10_000 },
-    // { name: 'for-horizontal', start: 1, end: 100_000, step: 10_000 },
-    // { name: 'binary-search', start: 1, end: 100_000, step: 10_000 },
-    // { name: 'binary-search-cache', start: 1, end: 100_000, step: 10_000 },
-    // { name: 'binary-search-pre-cache', start: 1, end: 100_000, step: 10_000 },
+    // { name: 'half-reversed-2', start: 1, end: 100_000, step: 0 },
+    // { name: 'binary-search', start: 1, end: 100_000, step: 0 },
+    // { name: 'binary-search-cache', start: 1, end: 100_000, step: 0 },
+    // { name: 'binary-search-formula', start: 1, end: 100_000, step: 0 },
+    // { name: 'binary-search-prebuild', start: 1, end: 100_000, step: 0 },
+    // { name: 'multithread', start: 1, end: 100_000, step: 10_000 },
 
-    // { name: 'recursive', start: 1, end: 1_000_000, step: 100_000 },
-    // { name: 'for', start: 1, end: 1_000_000, step: 100_000 },
-    // { name: 'for-horizontal', start: 1, end: 1_000_000, step: 100_000 },
-    // { name: 'binary-search', start: 1, end: 1_000_000, step: 100_000 },
-    // { name: 'binary-search-cache', start: 1, end: 1_000_000, step: 100_000 },
-    // { name: 'binary-search-pre-cache', start: 1, end: 1_000_000, step: 100_000 },
+    // // 1_000_000
+    // { name: 'simple', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'reversed', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'half-reversed-2', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'binary-search', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'binary-search-cache', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'binary-search-formula', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'binary-search-prebuild', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'multithread', start: 1, end: 1_000_000, step: 100_000 },
 
-    // { name: 'recursive', start: 1, end: 1_000_000_000, step: 100_000 },
-    // { name: 'for', start: 1, end: 1_000_000_000, step: 100_000 },
-    // { name: 'for-horizontal', start: 1, end: 1_000_000_000, step: 100_000 },
-    // { name: 'binary-search', start: 1, end: 1_000_000_000, step: 100_000 },
-    // { name: 'binary-search-cache', start: 1, end: 1_000_000_000, step: 100_000 },
-    // { name: 'binary-search-pre-cache', start: 1, end: 1_000_000_000, step: 100_000 },
-    
-    // { name: 'recursive', start: 1, end: 1_000_000_000, step: 1_000_000 },
-    // { name: 'for', start: 1, end: 1_000_000_000, step: 1_000_000 },
-    // { name: 'for-horizontal', start: 1, end: 1_000_000_000, step: 1_000_000 },
-    // { name: 'binary-search', start: 1, end: 1_000_000_000, step: 1_000_000 },
-    // { name: 'binary-search-cache', start: 1, end: 1_000_000_000, step: 1_000_000 },
-    // { name: 'binary-search-pre-cache', start: 1, end: 1_000_000_000, step: 1_000_000 },
-  ]
+    // // 10_000_000
+    // { name: 'half-reversed-2', start: 1, end: 1_000_000, step: 0 },
+    // { name: 'binary-search', start: 1, end: 10_000_000, step: 0 },
+    // { name: 'binary-search-cache', start: 1, end: 10_000_000, step: 0 },
+    // { name: 'binary-search-formula', start: 1, end: 10_000_000, step: 0 },
+    // { name: 'binary-search-prebuild', start: 1, end: 10_000_000, step: 0 },
+    // { name: 'multithread', start: 1, end: 10_000_000, step: 1_000_000 },
+
+    // 100_000_000
+    // { name: 'binary-search-prebuild', start: 1, end: 100_000_000, step: 0 },
+    { name: 'multithread', start: 1, end: 100_000_000, step: 10_000_000 },
+
+    // 500_000_000
+    { name: 'multithread', start: 1, end: 500_000_000, step: 100_000_000 },
+  ] as { name: string, start: number, end: number, step: number, timeout?: number }[]
 }
 
 const run = async () => {

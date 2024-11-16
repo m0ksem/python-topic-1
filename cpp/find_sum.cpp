@@ -2,9 +2,10 @@
 #include <vector>
 #include <unordered_map>
 #include <cmath>
+#include <map>
 // #include "tetradic.cpp"
 
-std::vector<int> findSum(int inputNumber, std::unordered_map< int, std::vector<int> >& cache) {
+std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cache) {
   if (cache.find(inputNumber) != cache.end()) {
     return cache[inputNumber];
   }

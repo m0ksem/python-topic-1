@@ -1,4 +1,4 @@
-import { makeTetradicNumber, getLowestTetradicNumberIndex } from '../lib';
+import { makeTetradicNumber } from '../lib';
 
 const makeTetradicNumbers = (num: number) => {
   const numbers = []

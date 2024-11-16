@@ -224,8 +224,6 @@ function test(start: number, end: number, step: number) {
       cache.set(i, result)
     }
   }
-
-  console.log(`Cache size: ${cache.size}, from cache: ${fromCacheCount}`)
 }
 
 const args = Bun.argv.slice(2).map(Number) as [number, number, number];

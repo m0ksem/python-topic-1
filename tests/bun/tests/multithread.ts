@@ -1,7 +1,5 @@
-import { makeTetradicNumber } from '../lib';
-
 const makeWorker = () => {
-  const worker = new Worker("./multithread-worker.ts");
+  const worker = new Worker(new URL("./multithread-worker.ts", import.meta.url).href);
 
   worker.onerror = event => {
     console.error(event);
@@ -13,6 +11,10 @@ const makeWorker = () => {
   }
   
   return worker
+}
+
+function makeTetradicNumber(index: number): number {
+  return (index * (index + 1) * (index + 2)) / 6;
 }
 
 const makeTetradicNumbers = (num: number) => {

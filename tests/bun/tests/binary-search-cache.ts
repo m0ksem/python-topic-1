@@ -18,45 +18,6 @@ const makeTetradicNumbers = (num: number) => {
 }
 
 
-const TEN_THOUSAND_INDEX = 100
-
-const preBuild = (end: number) => {
-  const results = new Map<number, number[]>()
-
-  // Prebuild small numbers, because they repeat frequently
-  for (let i = 1; i <= TEN_THOUSAND_INDEX; i++) {
-    const number1 = makeTetradicNumber(i)
-   
-    for (let j = 1; j <= TEN_THOUSAND_INDEX; j++) {
-      const number2 = makeTetradicNumber(j)
-      const sum = number1 + number2
-      
-      if (sum > end) {
-        break
-      }
-
-      for (let k = 1; k <= TEN_THOUSAND_INDEX; k++) {
-        const number3 = makeTetradicNumber(k)
-        const sum = number1 + number2 + number3
-        
-        if (sum > end) {
-          break
-        }
-  
-        results.set(sum, [number1, number2, number3])
-      }
-
-      results.set(sum, [number1, number2])
-    }
-
-    results.set(number1, [number1])
-  }
-
-  return results
-}
-
-let fromCacheCount = 0
-
 export function findSums(
   inputNumber: number,
   tetradicNumbers: number[],
@@ -108,7 +69,6 @@ export function findSums(
         const cached = cache.get(required2);
 
         if (cached && cached.length <= 3) {
-          fromCacheCount++
           return [number1, number2, ...cached];
         }
 
@@ -139,7 +99,7 @@ export function findSums(
             const cached = cache.get(required3);
 
             if (cached && cached.length <= 2) {
-              fromCacheCount++
+    
               return [number1, number2, number3, ...cached];
             }
 
@@ -166,7 +126,7 @@ export function findSums(
                 const cached = cache.get(required4);
 
                 if (cached && cached.length <= 1) {
-                  fromCacheCount++
+        
                   return [number1, number2, number3, number4, ...cached];
                 }
 
@@ -227,8 +187,6 @@ function test(start: number, end: number, step: number) {
       cache.set(i, result)
     }
   }
-
-  console.log(`Cache size: ${cache.size}, from cache: ${fromCacheCount}`)
 }
 
 const args = Bun.argv.slice(2).map(Number) as [number, number, number];

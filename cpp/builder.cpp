@@ -5,8 +5,8 @@
 
 const int TEN_THOUSAND_INDEX = 200;
 
-std::map<int, std::vector<int>> preBuild(int start, int end) {
-  std::map<int, std::vector<int>> results;
+std::map<int, std::array<int, 3>> preBuild(int start, int end) {
+  std::map<int, std::array<int, 3>> results;
 
   // Prebuild small numbers, because they repeat frequently
   for (int i = 1; i <= TEN_THOUSAND_INDEX; ++i) {
@@ -31,10 +31,10 @@ std::map<int, std::vector<int>> preBuild(int start, int end) {
         results[sum3] = {number1, number2, number3};
       }
 
-      results[sum] = {number1, number2};
+      results[sum] = {number1, number2, 0};
     }
 
-    results[number1] = {number1};
+    results[number1] = {number1, 0, 0};
   }
 
   return results;

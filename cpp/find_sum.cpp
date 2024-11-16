@@ -4,10 +4,13 @@
 #include <cmath>
 #include <map>
 // #include "tetradic.cpp"
+std::array<int, 5> findSum(int inputNumber, std::map< int, std::array<int, 3> >& cache) {
+  std::array<int, 5> result = {0, 0, 0, 0, 0};
 
-std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cache) {
   if (cache.find(inputNumber) != cache.end()) {
-    return cache[inputNumber];
+    const std::array<int, 3>& cached = cache[inputNumber];
+    std::copy(cached.begin(), cached.end(), result.begin());
+    return result;
   }
 
   int nearestTetradicNumberIndex = getLowestTetradicNumberIndex(inputNumber);
@@ -16,23 +19,23 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
     int number1 = makeTetradicNumber(number1Index);
 
     if (number1 == inputNumber) {
-      return std::vector<int>{ number1 };
+      result[0] = number1;
+      return result;
     }
 
     int required1 = inputNumber - number1;
 
-    if (cache.find(required1) != cache.end()) {
-      const std::vector<int>& cached = cache[required1];
-      if (cached.size() <= 4) {
-        std::vector<int> result;
-        result.push_back(number1);
-        result.insert(result.end(), cached.begin(), cached.end());
-        return result;
-      }
-    }
-
     if (required1 < 0) {
       continue;
+    }
+
+    if (cache.find(required1) != cache.end()) {
+      const std::array<int, 3>& cached = cache[required1];
+      result[0] = number1;
+      result[1] = cached[0];
+      result[2] = cached[1];
+      result[3] = cached[2];
+      return result;
     }
 
     int left2 = 0;
@@ -44,7 +47,9 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
       int number2 = makeTetradicNumber(number2Index);
 
       if (number2 == required1) {
-        return { number1, number2 };
+        result[0] = number1;
+        result[1] = number2;
+        return result;
       }
 
       if (number2 < required1) {
@@ -53,23 +58,25 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
         int number3Index;
         int required2 = required1 - number2;
 
+        if (cache.find(required2) != cache.end()) {
+          const std::array<int, 3>& cached = cache[required2];
+          result[0] = number1;
+          result[1] = number2;
+          result[2] = cached[0];
+          result[3] = cached[1];
+          result[4] = cached[2];
+          return result;
+        }
+
         while (left3 <= right3) {
           number3Index = (left3 + right3) / 2;
           int number3 = makeTetradicNumber(number3Index);
 
-          if (cache.find(required2) != cache.end()) {
-            const std::vector<int>& cached = cache[required2];
-            if (cached.size() <= 3) {
-              std::vector<int> result = {number1, number2};
-              result.insert(result.end(), cached.begin(), cached.end());
-              return result;
-            } else {
-              break;
-            }
-          }
-
           if (number3 == required2) {
-            return std::vector<int>{number1, number2, number3};
+            result[0] = number1;
+            result[1] = number2;
+            result[2] = number3;
+            return result;
           }
 
           if (number3 < required2) {
@@ -79,10 +86,13 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
             int required3 = required2 - number3;
 
             if (cache.find(required3) != cache.end()) {
-              const std::vector<int>& cached = cache[required3];
-              if (cached.size() <= 2) {
-                std::vector<int> result = {number1, number2, number3};
-                result.insert(result.end(), cached.begin(), cached.end());
+              const std::array<int, 3>& cached = cache[required3];
+              if (cached[2] == 0) {
+                result[0] = number1;
+                result[1] = number2;
+                result[2] = number3;
+                result[3] = cached[0];
+                result[4] = cached[1];
                 return result;
               } else {
                 break;
@@ -94,7 +104,11 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
               int number4 = makeTetradicNumber(number4Index);
 
               if (number4 == required3) {
-                return std::vector<int>{number1, number2, number3, number4};
+                result[0] = number1;
+                result[1] = number2;
+                result[2] = number3;
+                result[3] = number4;
+                return result;
               }
 
               if (number4 < required3) {
@@ -104,10 +118,13 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
                 int required4 = required3 - number4;
 
                 if (cache.find(required4) != cache.end()) {
-                  const std::vector<int>& cached = cache[required4];
-                  if (cached.size() <= 1) {
-                    std::vector<int> result = {number1, number2, number3, number4};
-                    result.insert(result.end(), cached.begin(), cached.end());
+                  const std::array<int, 3>& cached = cache[required4];
+                  if (cached[1] == 0 && cached[2] == 0) {
+                    result[0] = number1;
+                    result[1] = number2;
+                    result[2] = number3;
+                    result[3] = number4;
+                    result[4] = cached[0];
                     return result;
                   } else {
                     break;
@@ -119,7 +136,12 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
                   int number5 = makeTetradicNumber(number5Index);
 
                   if (number5 == required4) {
-                    return std::vector<int>{number1, number2, number3, number4, number5};
+                    result[0] = number1;
+                    result[1] = number2;
+                    result[2] = number3;
+                    result[3] = number4;
+                    result[4] = number5;
+                    return result;
                   }
 
                   if (number5 < required4) {
@@ -150,5 +172,5 @@ std::vector<int> findSum(int inputNumber, std::map< int, std::vector<int> >& cac
     }
   }
 
-  return {};
+  return result;
 }

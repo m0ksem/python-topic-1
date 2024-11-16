@@ -9,7 +9,7 @@
 #include "builder.cpp"
 
 const int start = 1;
-const int end = 1000000;
+const int end = 100000000;
 
 std::string printNumber(int number) {
   return std::to_string(number);
@@ -28,8 +28,6 @@ int main() {
 
   auto [result, time] = withTime([&]() {
     auto cache = preBuild(start, end);
-    int fromCacheCount = 0;
-
     for (int i = start; i < end; ++i) {
       auto result = findSum(i, cache);
       if (result.empty() || std::accumulate(result.begin(), result.end(), 0) != i || result.size() > 5 || result.size() < 0) {
@@ -38,10 +36,8 @@ int main() {
     }
   });
 
-  std::cout << "\r" << printNumber(end) << " / " << printNumber(end) << " (100%) (from cache: " << 0 << ")" << std::endl;
+  std::cout << "\r" << printNumber(end) << " / " << printNumber(end) << " (100%)" << std::endl;
   std::cout << "\nFinished testing from " << printNumber(start) << " to " << printNumber(end) << " in " << time << "s" << std::endl;
-  std::cout << "makeTetradicNumber calls count " << printNumber(0) << std::endl;
-  std::cout << "Accessed from cache " << printNumber(0) << std::endl;
 
   return 0;
 }

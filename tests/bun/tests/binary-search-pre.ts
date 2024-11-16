@@ -1,4 +1,4 @@
-import { makeTetradicNumber, getLowestTetradicNumberIndex, makeTetradicNumberCalls } from '../lib';
+import { makeTetradicNumber } from '../lib';
 
 const makeTetradicNumbers = (num: number) => {
   const numbers = []
@@ -139,13 +139,6 @@ export function findSums(inputNumber: number, tetradicNumbers: number[]): number
   return null;
 }
 
-let counts = {
-  1: 0,
-  2: 0,
-  3: 0,
-  4: 0,
-  5: 0
-} as Record<number, number>;
 
 function test(start: number, end: number, step: number) {
   const tetradicNumbers = makeTetradicNumbers(end);
@@ -156,17 +149,7 @@ function test(start: number, end: number, step: number) {
     if (result === null || result.reduce((acc, curr) => acc + curr, 0) !== i) {
       throw new Error(`No result for ${i}`);
     }
-
-    counts[result.length]++;
   }
-
-  console.log({
-    number1: counts[1] / end * 100 + '%',
-    number2: counts[2] / end * 100 + '%',
-    number3: counts[3] / end * 100 + '%',
-    number4: counts[4] / end * 100 + '%',
-    number5: counts[5] / end * 100 + '%',
-  })
 }
 
 const args = Bun.argv.slice(2).map(Number) as [number, number, number];

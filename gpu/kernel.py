@@ -8,7 +8,7 @@ import ctypes
 device = Metal.MTLCreateSystemDefaultDevice()
 library, error = device.newLibraryWithSource_options_error_(kernel_source, None, None)
 if error:
-  raise RuntimeError("Failed to create Metal library: {error}")
+  raise RuntimeError(f"Failed to create Metal library: {error}")
 kernel_function = library.newFunctionWithName_("run")
 if not kernel_function:
   raise RuntimeError("Failed to create kernel function 'run'")
@@ -59,13 +59,13 @@ def make_kernel(step):
   output_array_length = step * 5
   output_buffer_length = step * 5 * LONG_INT_SIZE
 
-  print("Array length: {array_length}", "Output array length: {output_array_length}")
+  print(f"Array length: {array_length}", f"Output array length: {output_array_length}")
 
   output_buffer = device.newBufferWithLength_options_(output_buffer_length, Metal.MTLResourceStorageModeShared)
 
   def run(start, end):
     if (end - start) > array_length:
-      raise ValueError("Input array size {end - start} is too large for buffer size {array_length}")
+      raise ValueError(f"Input array size {end - start} is too large for buffer size {array_length}")
 
 
     # Create a command buffer
@@ -93,7 +93,7 @@ def make_kernel(step):
     commandBuffer.commit()
     commandBuffer.waitUntilCompleted()
 
-    print("GPU execution time: {time.time() - startTime:.2f} seconds")
+    print(f"GPU execution time: {time.time() - startTime:.2f} seconds")
 
     output_data = (ctypes.c_long * output_array_length).from_buffer(output_buffer.contents().as_buffer(output_buffer_length))
     
@@ -109,10 +109,10 @@ def make_kernel(step):
       # print([output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]])
 
       if sum(output_data[i: i + 5]) != expected_sum:
-          print("Error: Expected {expected_sum}, got {[output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]]} ({sum(output_data[i: i + 5])}")
+          print(f"Error: Expected {expected_sum}, got {[output_data[i], output_data[i + 1], output_data[i + 2], output_data[i + 3], output_data[i + 4]]} ({sum(output_data[i: i + 5])}")
           break
 
-    print("Python validation time: {time.time() - startTime:.2f} seconds")
+    print(f"Python validation time: {time.time() - startTime:.2f} seconds")
 
     return output_list
 

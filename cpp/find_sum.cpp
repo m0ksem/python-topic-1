@@ -3,18 +3,16 @@
 #include <unordered_map>
 #include <cmath>
 #include <algorithm>
-
 std::vector<int> findSum(
   int inputNumber,
-  std::vector<int>& tetradicNumbers,
+  std::unordered_map<int, int>& tetradicNumbers,
   std::unordered_map<int, std::array<int, 3>>& preBuiltArray
 ) {
   auto prebuilt = preBuiltArray.find(inputNumber);
-
   if (prebuilt != preBuiltArray.end()) {
     return {prebuilt->second[0], prebuilt->second[1], prebuilt->second[2]};
   }
-
+  
   int number1Index = getTetradicNumberIndex(inputNumber);
 
   for (; number1Index > 0; number1Index--) {
@@ -26,8 +24,10 @@ std::vector<int> findSum(
     }
 
     prebuilt = preBuiltArray.find(required1);
-
     if (prebuilt != preBuiltArray.end()) {
+      if (prebuilt->second.size() > 4) {
+        break;
+      }
       return {number1, prebuilt->second[0], prebuilt->second[1], prebuilt->second[2]};
     }
 
@@ -42,7 +42,7 @@ std::vector<int> findSum(
     while (left2 <= right2) {
       number2Index = (left2 + right2) / 2;
       int number2 = tetradicNumbers[number2Index];
-
+  
       if (number2 == required1) {
         return {number1, number2};
       }
@@ -51,8 +51,10 @@ std::vector<int> findSum(
         int required2 = required1 - number2;
 
         prebuilt = preBuiltArray.find(required2);
-
         if (prebuilt != preBuiltArray.end()) {
+          if (prebuilt->second.size() > 3) {
+            break;
+          }
           return {number1, number2, prebuilt->second[0], prebuilt->second[1], prebuilt->second[2]};
         }
 
@@ -64,6 +66,7 @@ std::vector<int> findSum(
 
         while (left3 <= right3) {
           number3Index = (left3 + right3) / 2;
+
           int number3 = tetradicNumbers[number3Index];
 
           if (number3 == required2) {
@@ -71,9 +74,17 @@ std::vector<int> findSum(
           }
 
           if (required2 > number3) {
+            left3 = number3Index + 1;
+
             int required3 = required2 - number3;
 
-            left3 = number3Index + 1;
+            prebuilt = preBuiltArray.find(required3);
+            if (prebuilt != preBuiltArray.end()) {
+              if (prebuilt->second.size() > 2) {
+                break;
+              }
+              return {number1, number2, number3, prebuilt->second[0], prebuilt->second[1]};
+            }
 
             int left4 = 0;
             int right4 = left3;
@@ -89,6 +100,15 @@ std::vector<int> findSum(
 
               if (required3 > number4) {
                 int required4 = required3 - number4;
+
+                prebuilt = preBuiltArray.find(required4);
+    
+                if (prebuilt != preBuiltArray.end()) {
+                  if (prebuilt->second.size() > 1) {
+                    break;
+                  }
+                  return {number1, number2, number3, number4, prebuilt->second[0]};
+                }
 
                 left4 = number4Index + 1;
 

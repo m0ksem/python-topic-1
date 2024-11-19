@@ -87,18 +87,24 @@ const makeTests = (end: number) => {
   
     { runner: 'python', name: 'multithread', start: 1, end: end, step: end / 10 },
     { runner: 'bun', name: 'multithread', start: 1, end: end, step: end / 10 },
+
+    { runner: 'bun', name: 'horizontal-binary-search', start: 1, end: end, step: end / 10 },
   ] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
 }
 
 const config = [
-  { runner: 'bun', name: 'multithread', start: 1, end: 100_000_000, step: 100_000_000 / 10 },
   // ...makeTests(10_000),
   // ...makeTests(100_000),
   // ...makeTests(100_000),
   // ...makeTests(1_000_000),
   // ...makeTests(10_000_000),
   // ...makeTests(100_000_000),
+    // ...makeTests(250_000_000),
+    // ...makeTests(500_000_000),
   // ...makeTests(1_000_000_000),
+  // { runner: 'bun', name: 'multithread-horizontal', start: 1, end: 10_000, step: 10_000 / 10 },
+  { runner: 'python', name: 'multithread', start: 1, end: 1_000_000_000, step: 100_000_000, timeout: 10 },
+  // { runner: 'bun', name: 'multithread', start: 1, end: 1_000_000_000, step: 100_000_000, timeout: 10 },
 ] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
 
 const run = async () => {

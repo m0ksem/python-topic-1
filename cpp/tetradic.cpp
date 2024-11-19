@@ -22,3 +22,4 @@ double getTetradicNumberIndex(double y) {
 int getLowestTetradicNumberIndex(double number) {
   return round(getTetradicNumberIndex(number));
 }
+

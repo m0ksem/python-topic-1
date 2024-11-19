@@ -174,6 +174,7 @@ self.onmessage = (event: MessageEvent) => {
   const results = [] as number[][]
   const { start, end, cache } = event.data
   // const cache = preBuild(start, end)
+  const counts = [0, 0, 0, 0, 0, 0]
 
   for (let i = start; i <= end; i++) {
     const result = findSums(i, event.data.tetradicNumbers, cache)
@@ -182,6 +183,8 @@ self.onmessage = (event: MessageEvent) => {
       postMessage({ error: 'Failed at ' + i });
       throw new Error('Failed at ' + i)
     }
+
+    counts[result.length]++
 
     let sum = 0
 
@@ -194,6 +197,8 @@ self.onmessage = (event: MessageEvent) => {
       throw new Error('Failed at ' + i + ' sum is incorrect (' + sum + ')')
     }
   }
+
+  console.log(counts)
 
   postMessage({
     sums: results,

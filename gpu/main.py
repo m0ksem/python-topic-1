@@ -3,7 +3,7 @@ from kernel import make_kernel
 
 start = 1
 end = 200_000_000
-step = 100_000_000
+step = 10_000_000
 # end = 100
 # step = int(100)
 

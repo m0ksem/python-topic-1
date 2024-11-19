@@ -16,54 +16,58 @@ const makeTetradicNumbers = (num: number) => {
 
   return numbers;
 }
-
 function findSums(inputNumber: number): number[] | null {
   const tetradicNumbers = makeTetradicNumbers(inputNumber);
   const length = tetradicNumbers.length;
 
-  for (let i = length - 1; i >= 0; i--) {
-    const sum = tetradicNumbers[i];
-    if (tetradicNumbers[i] === inputNumber) {
-      return [tetradicNumbers[i]];
+  for (let i1 = length - 1; i1 >= 0; i1--) {
+    const n1 = tetradicNumbers[i1];
+    if (n1 === inputNumber) {
+      return [n1];
     }
 
-    if (sum > inputNumber) {
+    if (n1 > inputNumber) {
       continue;
     }
 
-    for (let j = length - 1; j >= i; j--) {
-      const sum2 = tetradicNumbers[i] + tetradicNumbers[j];
-      if (sum2 === inputNumber) {
-         return [tetradicNumbers[i], tetradicNumbers[j]];
+    for (let i2 = length - 1; i2 >= i1; i2--) {
+      const n2 = tetradicNumbers[i2];
+      const required2 = inputNumber - n1 - n2;
+      if (required2 === 0) {
+        return [n1, n2];
       }
 
-      if (sum2 > inputNumber) {
+      if (required2 < 0) {
         continue;
       }
 
-      for (let k = j; k >= i; k--) {
-        const sum3 = tetradicNumbers[i] + tetradicNumbers[j] + tetradicNumbers[k];
-        if (sum3 === inputNumber) {
-          return [tetradicNumbers[i], tetradicNumbers[j], tetradicNumbers[k]];
+      for (let i3 = i2; i3 >= i1; i3--) {
+        const n3 = tetradicNumbers[i3];
+        const required3 = required2 - n3;
+        if (required3 === 0) {
+          return [n1, n2, n3];
         }
 
-        if (sum3 > inputNumber) {
+        if (required3 < 0) {
           continue;
         }
 
-        for (let l = k; l >= i; l--) {
-          const sum4 = tetradicNumbers[i] + tetradicNumbers[j] + tetradicNumbers[k] + tetradicNumbers[l];
-          if (sum4 === inputNumber) {
-            return [tetradicNumbers[i], tetradicNumbers[j], tetradicNumbers[k], tetradicNumbers[l]];
+        for (let i4 = i3; i4 >= i1; i4--) {
+          const n4 = tetradicNumbers[i4];
+          const required4 = required3 - n4;
+          if (required4 === 0) {
+            return [n1, n2, n3, n4];
           }
 
-          if (sum4 > inputNumber) {
+          if (required4 < 0) {
             continue;
           }
 
-          for (let m = l; m >= i; m--) {
-            if (tetradicNumbers[i] + tetradicNumbers[j] + tetradicNumbers[k] + tetradicNumbers[l] + tetradicNumbers[m] === inputNumber) {
-              return [tetradicNumbers[i], tetradicNumbers[j], tetradicNumbers[k], tetradicNumbers[l], tetradicNumbers[m]];
+          for (let i5 = i4; i5 >= i1; i5--) {
+            const n5 = tetradicNumbers[i5];
+            const required5 = required4 - n5;
+            if (required5 === 0) {
+              return [n1, n2, n3, n4, n5];
             }
           }
         }

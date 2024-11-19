@@ -4,7 +4,7 @@
 #include <cmath>
 #include <map>
 // #include "tetradic.cpp"
-std::array<int, 5> findSum(int inputNumber, std::map< int, std::array<int, 3> >& cache) {
+std::array<int, 5> findSum(int inputNumber, std::unordered_map< int, std::array<int, 3> >& cache) {
   std::array<int, 5> result = {0, 0, 0, 0, 0};
 
   if (cache.find(inputNumber) != cache.end()) {

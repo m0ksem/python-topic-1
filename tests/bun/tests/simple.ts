@@ -1,5 +1,6 @@
-import { makeTetradicNumber, getLowestTetradicNumberIndex } from '../lib';
-
+export function makeTetradicNumber(index: number): number {
+  return (index * (index + 1) * (index + 2)) / 6;
+}
 const makeTetradicNumbers = (num: number) => {
   const numbers = []
   let index = 0
@@ -21,45 +22,23 @@ function findSums(inputNumber: number): number[] | null {
   const tetradicNumbers = makeTetradicNumbers(inputNumber);
   const length = tetradicNumbers.length;
 
-  for (let i = 0; i < length; i++) {
-    if (tetradicNumbers[i] === inputNumber) {
-      return [tetradicNumbers[i]];
-    }
-
-    for (let j = i; j < length; j++) {
-      const sum2 = tetradicNumbers[i] + tetradicNumbers[j];
-
-      if (sum2 === inputNumber) {
-        return [tetradicNumbers[i], tetradicNumbers[j]];
-      }
-      
-      if (sum2 > inputNumber) {
-        break;
-      }
-
-      for (let k = j; k < length; k++) {
-        const sum3 = tetradicNumbers[i] + tetradicNumbers[j] + tetradicNumbers[k];
-        if (sum3 === inputNumber) {
-          return [tetradicNumbers[i], tetradicNumbers[j], tetradicNumbers[k]];
-        }
-
-        if (sum3 > inputNumber) {
-          break;
-        }
-
-        for (let l = k; l < length; l++) {
-          const sum4 = tetradicNumbers[i] + tetradicNumbers[j] + tetradicNumbers[k] + tetradicNumbers[l];
-          if (sum4 === inputNumber) {
-            return [tetradicNumbers[i], tetradicNumbers[j], tetradicNumbers[k], tetradicNumbers[l]];
-          }
-
-          if (sum4 > inputNumber) {
-            break;
-          }
-
-          for (let m = l; m < length; m++) {
-            if (tetradicNumbers[i] + tetradicNumbers[j] + tetradicNumbers[k] + tetradicNumbers[l] + tetradicNumbers[m] === inputNumber) {
-              return [tetradicNumbers[i], tetradicNumbers[j], tetradicNumbers[k], tetradicNumbers[l], tetradicNumbers[m]];
+  for (let i1 = 0; i1 < length; i1++) {
+    const n1 = makeTetradicNumber(i1);
+    const required1 = inputNumber - n1;
+    for (let i2 = 0; i2 < length; i2++) {
+      const n2 = makeTetradicNumber(i2);
+      const required2 = required1 - n2;
+      for (let i3 = 0; i3 < length; i3++) {
+        const n3 = makeTetradicNumber(i3);
+        const required3 = required2 - n3;
+        for (let i4 = 0; i4 < length; i4++) {
+          const n4 = makeTetradicNumber(i4);
+          const required4 = required3 - n4;
+          for (let i5 = 0; i5 < length; i5++) {
+            const n5 = makeTetradicNumber(i5);
+            const required5 = required4 - n5;
+            if (required5 === 0) {
+              return [n1, n2, n3, n4, n5];
             }
           }
         }

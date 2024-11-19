@@ -1,4 +1,6 @@
-import { makeTetradicNumber } from '../lib';
+export function makeTetradicNumber(index: number): number {
+  return (index * (index + 1) * (index + 2)) / 6;
+}
 
 const makeTetradicNumbers = (num: number) => {
   const numbers = []
@@ -212,6 +214,8 @@ export function findSums(
 function test(start: number, end: number, step: number) {
   const tetradicNumbers = makeTetradicNumbers(end);
   const cache = preBuild(end);
+
+  console.log('Cache size:', cache.size)
 
   for (let i = start; i < end; i++) {
     const result = findSums(i, tetradicNumbers, cache);

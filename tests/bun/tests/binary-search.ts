@@ -1,5 +1,6 @@
-import { makeTetradicNumber, getLowestTetradicNumberIndex, makeTetradicNumberCalls } from '../lib';
-
+export function makeTetradicNumber(index: number): number {
+  return (index * (index + 1) * (index + 2)) / 6;
+}
 const makeTetradicNumbers = (num: number) => {
   const numbers = []
   let index = 0

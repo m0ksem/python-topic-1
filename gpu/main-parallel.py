@@ -3,8 +3,8 @@ from kernel import Kernel
 import multiprocessing
 
 start = 1
-end = 100_000_000
-step = 1_000_000
+end = 200_000_000
+step = 20_000_000
 
 if step > end - start:
     step = end - start

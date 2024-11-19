@@ -7,14 +7,14 @@ def pre_build(size, end):
     for i in range(1, size + 1):
         number1 = make_tetradic_number(i)
 
-        for j in range(1, size + 1):
+        for j in range(1, size + 1 / 2):
             number2 = make_tetradic_number(j)
             sum_2 = number1 + number2
 
             if sum_2 > end:
                 break
 
-            for k in range(1, size + 1):
+            for k in range(1, size + 1 / 3):
                 number3 = make_tetradic_number(k)
                 sum_3 = number1 + number2 + number3
 

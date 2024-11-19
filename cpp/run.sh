@@ -1,1 +1,1 @@
-clang++ main.cpp -std=c++20 -O2 -o main && ./main                                                                                                                                                  
+clang++ main-threads.cpp -std=c++20 -O2 -o main && ./main                                                                                                                                                  

@@ -91,13 +91,14 @@ const makeTests = (end: number) => {
 }
 
 const config = [
-  ...makeTests(10_000),
-  ...makeTests(100_000),
-  ...makeTests(100_000),
-  ...makeTests(1_000_000),
-  ...makeTests(10_000_000),
-  ...makeTests(100_000_000),
-  ...makeTests(1_000_000_000),
+  { runner: 'bun', name: 'multithread', start: 1, end: 100_000_000, step: 100_000_000 / 10 },
+  // ...makeTests(10_000),
+  // ...makeTests(100_000),
+  // ...makeTests(100_000),
+  // ...makeTests(1_000_000),
+  // ...makeTests(10_000_000),
+  // ...makeTests(100_000_000),
+  // ...makeTests(1_000_000_000),
 ] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
 
 const run = async () => {

@@ -37,7 +37,7 @@ const makeTetradicNumbers = (num: number) => {
 const workers = [
   makeWorker(), makeWorker(), makeWorker(), makeWorker(),
   makeWorker(), makeWorker(), makeWorker(), makeWorker(),
-  makeWorker(), makeWorker(), 
+  // makeWorker(), makeWorker(), 
 ]
 
 let doneTasks = 0
@@ -79,8 +79,6 @@ const preBuild = (end: number) => {
 }
 
 function test(start: number, end: number, step: number) {
-  const startTime = Date.now()
-
   return new Promise((resolve, reject) => {
     const tetradicNumbers = makeTetradicNumbers(end);
     const cache = preBuild(end);
@@ -100,7 +98,6 @@ function test(start: number, end: number, step: number) {
         if (doneTasks === tasksCount) {
           workers.forEach(worker => worker.terminate())
           resolve(doneTasks)
-          console.log('Time:', Date.now() - startTime)
           process.exit(0)
         } else if (startedTasks < tasksCount) {
           worker.postMessage({

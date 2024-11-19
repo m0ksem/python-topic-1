@@ -4,7 +4,7 @@ export const printNumber = (n: number) => {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-const results = [] as { testName: string, range: string, time: string }[]
+const results = {} as Record<string, Record<string, string>>
 
 const commands = {
   bun: (testName: string) => `bun run ./bun/tests/${testName}.ts`,
@@ -37,11 +37,13 @@ const runTest = (runner: keyof typeof commands, testName: string, start: number,
 
       const time = endMs - startMs;
 
-      results.push({
-        testName: testName,
-        range: `${printNumber(start)} - ${printNumber(end)}${stepText}`,
-        time: `${printNumber(time / 1000)}s`,
-      })
+      // results.push({
+      //   testName: testName,
+      //   range: `${printNumber(start)} - ${printNumber(end)}${stepText}`,
+      //   time: `${printNumber(time / 1000)}s`,
+      // })
+      results[printNumber(end)] = results[printNumber(end)] || {}
+      results[printNumber(end)][testName] = String(time / 1000)
       clearTimeout(timeout);
       resolve(true);
     })
@@ -54,107 +56,54 @@ const runTest = (runner: keyof typeof commands, testName: string, start: number,
     timeout = setTimeout(() => {
       process.kill()
       console.error(`Timeout for ${testName} ${start} - ${end} ${step}`)
-      results.push({
-        testName: testName,
-        range: `${printNumber(start)} - ${printNumber(end)}${stepText}`,
-        time: `>${printNumber(timeoutInMins * 60)}s`,
-      })
+      results[printNumber(end)] = results[printNumber(end)] || {}
+      results[printNumber(end)][testName] = '>30'
+      // results.push({
+      //   testName: testName,
+      //   range: `${printNumber(start)} - ${printNumber(end)}${stepText}`,
+      //   time: `>${printNumber(timeoutInMins * 60)}s`,
+      // })
       resolve(true)
     }, 1000 * 60 * timeoutInMins)
   })
 }
 
-const config = {
-  python: [
-    // 10_000
-    // { name: 'simple', start: 1, end: 10_000, step: 0 },
-    // { name: 'reversed', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search-prebuild', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search-prebuild-skip', start: 1, end: 10_000, step: 0 },
-    { name: 'multithread', start: 1, end: 10_000, step: 10_000 },
-  ],
-  bun: [
-    // 10_000
-    // { name: 'simple', start: 1, end: 10_000, step: 0 },
-    // { name: 'reversed', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search-prebuild', start: 1, end: 10_000, step: 0 },
-    { name: 'binary-search-prebuild-skip', start: 1, end: 10_000, step: 0 },
-    { name: 'multithread', start: 1, end: 10_000, step: 10_000 },
+const makeTests = (end: number) => {
+  return [
+    { runner: 'python', name: 'simple', start: 1, end: end, step: 0 },
+    { runner: 'bun', name: 'simple', start: 1, end: end, step: 0 },
+  
+    { runner: 'python', name: 'reversed', start: 1, end: end, step: 0 },
+    { runner: 'bun', name: 'reversed', start: 1, end: end, step: 0 },
+  
+    { runner: 'python', name: 'binary-search', start: 1, end: end, step: 0 },
+    { runner: 'bun', name: 'binary-search', start: 1, end: end, step: 0 },
+  
+    { runner: 'python', name: 'binary-search-prebuild', start: 1, end: end, step: 0 },
+    { runner: 'bun', name: 'binary-search-prebuild', start: 1, end: end, step: 0 },
+  
+    { runner: 'python', name: 'binary-search-prebuild-skip', start: 1, end: end, step: 0 },
+    { runner: 'bun', name: 'binary-search-prebuild-skip', start: 1, end: end, step: 0 },
+  
+    { runner: 'python', name: 'multithread', start: 1, end: end, step: end / 10 },
+    { runner: 'bun', name: 'multithread', start: 1, end: end, step: end / 10 },
+  ] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
+}
 
-
-
-
-
-
-
-    // { name: 'half-reversed-2', start: 1, end: 10_000, step: 0 },
-    // { name: 'half-reversed-3', start: 1, end: 10_000, step: 0 },
-    // { name: 'binary-search-pre', start: 1, end: 10_000, step: 0 },
-    // { name: 'binary-search-formula', start: 1, end: 10_000, step: 0 },
-    // { name: 'horizontal-binary-search', start: 1, end: 10_000, step: 10_000 },
-
-    // // 100_000
-    // { name: 'simple', start: 1, end: 100_000, step: 0 },
-    // { name: 'reversed', start: 1, end: 100_000, step: 0 },
-    // { name: 'half-reversed-2', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search-pre', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search-cache', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search-formula', start: 1, end: 100_000, step: 0 },
-    // { name: 'binary-search-prebuild', start: 1, end: 100_000, step: 0 },
-    // { name: 'multithread', start: 1, end: 100_000, step: 10_000 },
-    // { name: 'horizontal-binary-search', start: 1, end: 100_000, step: 0 },
-
-    // // 1_000_000
-    // { name: 'simple', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'reversed', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'half-reversed-2', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search-cache', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search-formula', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search-prebuild', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'horizontal-binary-search', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'multithread', start: 1, end: 1_000_000, step: 1_000_000 },
-
-    // // 10_000_000
-    // { name: 'half-reversed-2', start: 1, end: 1_000_000, step: 0 },
-    // { name: 'binary-search', start: 1, end: 10_000_000, step: 0 },
-    // { name: 'binary-search-cache', start: 1, end: 10_000_000, step: 0 },
-    // { name: 'binary-search-formula', start: 1, end: 10_000_000, step: 0 },
-    // { name: 'binary-search-prebuild', start: 1, end: 10_000_000, step: 0 },
-    // { name: 'multithread', start: 1, end: 10_000_000, step: 1_000_000 },
-
-    // 100_000_000
-    // { name: 'binary-search-prebuild', start: 1, end: 100_000_000, step: 0 },
-    // { name: 'multithread', start: 1, end: 100_000_000, step: 10_000_000 },
-
-    // 200_000_000
-    // { name: 'multithread', start: 1, end: 200_000_000, step: 20_000_000 },
-
-    // 500_000_000
-    // { name: 'multithread', start: 1, end: 500_000_000, step: 25_000_000, timeout: 10 },
-
-    // 1_000_000_000
-    // { name: 'multithread', start: 1, end: 1_000_000_000, step: 25_000_000, timeout: 10 },
-    
-    // 2_000_000_000
-    // { name: 'multithread', start: 1, end: 2_000_000_000, step: 25_000_000, timeout: 10 },
-
-    // 5_000_000_000
-    // { name: 'multithread', start: 1, end: 5_000_000_000, step: 25_000_000, timeout: 10 },
-  ]
-} as Record<string, { name: string, start: number, end: number, step: number, timeout?: number }[]>
+const config = [
+  ...makeTests(10_000),
+  ...makeTests(100_000),
+  ...makeTests(100_000),
+  ...makeTests(1_000_000),
+  ...makeTests(10_000_000),
+  ...makeTests(100_000_000),
+  ...makeTests(1_000_000_000),
+] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
 
 const run = async () => {
-  for (const r in commands) {
-    console.log(`Running tests for ${r}`)
-    const runner = r as keyof typeof commands;
-    for (let i = 0; i < config[runner].length; i++) {
-      const test = config[runner][i];
-      await runTest(runner, test.name, test.start, test.end, test.step, test.timeout)
-    }
+  for (let i = 0; i < config.length; i++) {
+    const test = config[i];
+    await runTest(test.runner, test.name, test.start, test.end, test.step, test.timeout)
   }
 
   console.table(results)

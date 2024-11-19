@@ -198,8 +198,6 @@ self.onmessage = (event: MessageEvent) => {
     }
   }
 
-  console.log(counts)
-
   postMessage({
     sums: results,
     start: event.data.start,

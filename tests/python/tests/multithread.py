@@ -21,6 +21,19 @@ def make_tetradic_numbers(num):
 
   return numbers
 
+def get_tetradic_number_index(y):
+  one_third = 1 / 3
+  minus_one_third_cube = (-one_third) ** 3
+
+  half_d = -3 * y
+  discriminant_sqrt = (half_d ** 2 + minus_one_third_cube) ** 0.5
+
+  offset_d = -half_d
+  u = (offset_d + discriminant_sqrt) ** one_third
+  v = (offset_d - discriminant_sqrt) ** one_third
+
+  return round(u + v - 1)
+
 TEN_THOUSAND_INDEX = 100
 
 def pre_build(end):
@@ -51,22 +64,27 @@ def pre_build(end):
 
   return results
 
-def find_sums(input_number, tetradic_numbers, cache):
-  length = len(tetradic_numbers)
+def find_sums(input_number, tetradic_numbers, pre_built_array):
+  prebuilt = pre_built_array.get(input_number)
 
-  for number1_index in range(length - 1, 0, -1):
+  if prebuilt:
+    return prebuilt
+
+  number1_index = get_tetradic_number_index(input_number)
+
+  for number1_index in range(number1_index, 0, -1):
     number1 = tetradic_numbers[number1_index]
     required1 = input_number - number1
 
     if required1 < 0:
       continue
 
-    cached = cache.get(required1)
-    if cached:
-      if len(cached) <= 4:
-        return [number1] + cached
-      else:
+    prebuilt = pre_built_array.get(required1)
+
+    if prebuilt:
+      if len(prebuilt) > 4:
         break
+      return [number1, prebuilt[0], prebuilt[1] if len(prebuilt) > 1 else 0, prebuilt[2] if len(prebuilt) > 2 else 0, prebuilt[3] if len(prebuilt) > 3 else 0]
 
     if number1 == input_number:
       return [number1]
@@ -80,20 +98,17 @@ def find_sums(input_number, tetradic_numbers, cache):
       if number2 == required1:
         return [number1, number2]
 
-      if number2 < required1:
+      if required1 > number2:
         required2 = required1 - number2
+        prebuilt = pre_built_array.get(required2)
 
-        if required2 < 0:
-          continue
-
-        cached = cache.get(required2)
-        if cached:
-          if len(cached) <= 3:
-            return [number1, number2] + cached
-          else:
+        if prebuilt:
+          if len(prebuilt) > 3:
             break
+          return [number1, number2, prebuilt[0], prebuilt[1] if len(prebuilt) > 1 else 0, prebuilt[2] if len(prebuilt) > 2 else 0]
 
-        left3, right3 = 0, number2_index + 1
+        left2 = number2_index + 1
+        left3, right3 = 0, left2
 
         while left3 <= right3:
           number3_index = (left3 + right3) // 2
@@ -102,20 +117,17 @@ def find_sums(input_number, tetradic_numbers, cache):
           if number3 == required2:
             return [number1, number2, number3]
 
-          if number3 < required2:
+          if required2 > number3:
             required3 = required2 - number3
+            prebuilt = pre_built_array.get(required3)
 
-            if required3 < 0:
-              continue
-
-            cached = cache.get(required3)
-            if cached:
-              if len(cached) <= 2:
-                return [number1, number2, number3] + cached
-              else:
+            if prebuilt:
+              if len(prebuilt) > 2:
                 break
+              return [number1, number2, number3, prebuilt[0], prebuilt[1] if len(prebuilt) > 1 else 0]
 
-            left4, right4 = 0, number3_index + 1
+            left3 = number3_index + 1
+            left4, right4 = 0, left3
 
             while left4 <= right4:
               number4_index = (left4 + right4) // 2
@@ -124,20 +136,17 @@ def find_sums(input_number, tetradic_numbers, cache):
               if number4 == required3:
                 return [number1, number2, number3, number4]
 
-              if number4 < required3:
+              if required3 > number4:
                 required4 = required3 - number4
+                prebuilt = pre_built_array.get(required4)
 
-                if required4 < 0:
-                  continue
-
-                cached = cache.get(required4)
-                if cached:
-                  if len(cached) <= 1:
-                    return [number1, number2, number3, number4] + cached
-                  else:
+                if prebuilt:
+                  if len(prebuilt) > 1:
                     break
+                  return [number1, number2, number3, number4, prebuilt[0]]
 
-                left5, right5 = 0, number4_index + 1
+                left4 = number4_index + 1
+                left5, right5 = 0, left4
 
                 while left5 <= right5:
                   number5_index = (left5 + right5) // 2
@@ -146,25 +155,19 @@ def find_sums(input_number, tetradic_numbers, cache):
                   if number5 == required4:
                     return [number1, number2, number3, number4, number5]
 
-                  if number5 < required4:
+                  if required4 > number5:
                     left5 = number5_index + 1
                   else:
                     right5 = number5_index - 1
-
-                left4 = number4_index + 1
               else:
                 right4 = number4_index - 1
-
-          if number3 < required2:
-            left3 = number3_index + 1
           else:
             right3 = number3_index - 1
-
-        left2 = number2_index + 1
       else:
         right2 = number2_index - 1
 
   return None
+
 
 def test(start, end):
   tetradic_numbers = make_tetradic_numbers(end)
@@ -199,7 +202,6 @@ def try_range_hypothesis_multithread(start, end, step):
 
 
   end_time = time.time()
-  print(f"Finished testing from {start} to {end} in {end_time - start_time} seconds")
 
 if __name__ == "__main__":
   args = list(map(int, sys.argv[1:4]))

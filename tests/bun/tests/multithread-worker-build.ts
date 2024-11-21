@@ -170,6 +170,8 @@ declare var self: Worker;
 self.onmessage = (event: MessageEvent) => {
   const results = [] as number[][]
   const { start, end } = event.data
+  // const cache = preBuild(start, end)
+  const counts = [0, 0, 0, 0, 0, 0]
 
   for (let i = start; i <= end; i++) {
     const result = findSums(i, event.data.tetradicNumbers)
@@ -178,6 +180,8 @@ self.onmessage = (event: MessageEvent) => {
       postMessage({ error: 'Failed at ' + i });
       throw new Error('Failed at ' + i)
     }
+
+    counts[result.length]++
 
     let sum = 0
 

@@ -192,6 +192,8 @@ function test(start: number, end: number, step: number) {
   for (let i = start; i < end; i++) {
     const result = findSums(i, tetradic);
 
+    console.log(i + ' = ' + result?.join(' + '));
+
     if (result === null || result.reduce((acc, curr) => acc + curr, 0) !== i) {
       throw new Error(`No result for ${i}`);
     }

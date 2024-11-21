@@ -182,7 +182,6 @@ def test(start, end):
   return True
 
 def try_range_hypothesis_multithread(start, end, step):
-  start_time = time.time()
   max_threads = 8
 
   threads = []
@@ -200,8 +199,6 @@ def try_range_hypothesis_multithread(start, end, step):
   for thread in threads:
     thread.join()
 
-
-  end_time = time.time()
 
 if __name__ == "__main__":
   args = list(map(int, sys.argv[1:4]))

@@ -43,7 +43,7 @@ function findSums(
       if (prebuilt.length > 4) {
         break
       }
-      return [number1, prebuilt[0], prebuilt[1] ?? 0, prebuilt[2] ?? 0, prebuilt[3] ?? 0];
+      return [number1, prebuilt[0], prebuilt[1] ?? 0, prebuilt[2] ?? 0, 0];
     }
 
     if (number1 === inputNumber) {
@@ -167,25 +167,86 @@ function findSums(
   return null;
 }
 
+function makeTetradicNumber(index: number): number {
+  return (index * (index + 1) * (index + 2)) / 6;
+}
+
+const TEN_THOUSAND_INDEX = 200
+
+
+
+const preBuild = (end: number) => {
+  const results = {} as Record<number, number[]>
+  // Prebuild small numbers, because they repeat frequently
+  for (let i = 1; i <= TEN_THOUSAND_INDEX; i++) {
+    const number1 = makeTetradicNumber(i)
+   
+    for (let j = 1; j <= TEN_THOUSAND_INDEX / 2; j++) {
+      const number2 = makeTetradicNumber(j)
+      const sum = number1 + number2
+      
+      if (sum > end) {
+        break
+      }
+
+      for (let k = 1; k <= TEN_THOUSAND_INDEX / 2; k++) {
+        const number3 = makeTetradicNumber(k)
+        const sum = number1 + number2 + number3
+        
+        if (sum > end) {
+          break
+        }
+
+        results[sum] = [number1, number2, number3]
+      }
+
+      results[sum] = [number1, number2]
+    }
+
+    results[number1] = [number1]
+  }
+
+  return results
+}
+
+const makeTetradicNumbers = (num: number) => {
+  const numbers = []
+  let index = 0
+
+  while (true) {
+    const tetradicNumber = makeTetradicNumber(index);
+    if (tetradicNumber > num) {
+      break;
+    }
+
+    numbers.push(tetradicNumber);
+    index++
+  }
+
+  return numbers;
+}
+
 // prevents TS errors
 declare var self: Worker;
 
+const counts = [0, 0, 0, 0, 0]
+
 self.onmessage = (event: MessageEvent) => {
-  const results = [] as number[][]
-  const { start, end, cache } = event.data
-  // const cache = preBuild(start, end)
-  const counts = [0, 0, 0, 0, 0, 0]
+  const { start, end } = event.data
+
+  const tetradicNumbers = makeTetradicNumbers(end);
+  const cache = preBuild(end);
 
   for (let i = start; i <= end; i++) {
-    const result = findSums(i, event.data.tetradicNumbers, cache)
+    const result = findSums(i, tetradicNumbers, cache)
     
     if (result === null) {
       postMessage({ error: 'Failed at ' + i });
       throw new Error('Failed at ' + i)
     }
 
-    counts[result.length]++
-
+    counts[result.length - 1]++ 
+  
     let sum = 0
 
     for (let j = 0; j < result.length; j++) {
@@ -199,7 +260,8 @@ self.onmessage = (event: MessageEvent) => {
   }
 
   postMessage({
-    sums: results,
+    counts,
+    // sums: results,
     start: event.data.start,
     end: event.data.end,
   });

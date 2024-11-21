@@ -11,7 +11,7 @@ const commands = {
   python: (testName: string) => `python3 ./python/tests/${testName}.py`,
 }
 
-const runTest = (runner: keyof typeof commands, testName: string, start: number, end: number, step: number, timeoutInMins = 0.5) => {
+const runTest = (runner: keyof typeof commands, testName: string, start: number, end: number, step: number, timeoutInMins = 0.25) => {
   return new Promise((resolve, reject) => {
     const startMs = new Date().getTime();
     const command = `${commands[runner](testName)} ${start} ${end} ${step}`;
@@ -70,41 +70,44 @@ const runTest = (runner: keyof typeof commands, testName: string, start: number,
 
 const makeTests = (end: number) => {
   return [
-    { runner: 'python', name: 'simple', start: 1, end: end, step: 0 },
-    { runner: 'bun', name: 'simple', start: 1, end: end, step: 0 },
+    // { runner: 'python', name: 'simple', start: 1, end: end, step: 0 },
+    // { runner: 'bun', name: 'simple', start: 1, end: end, step: 0 },
   
-    { runner: 'python', name: 'reversed', start: 1, end: end, step: 0 },
-    { runner: 'bun', name: 'reversed', start: 1, end: end, step: 0 },
+    // { runner: 'python', name: 'reversed', start: 1, end: end, step: 0 },
+    // { runner: 'bun', name: 'reversed', start: 1, end: end, step: 0 },
   
-    { runner: 'python', name: 'binary-search', start: 1, end: end, step: 0 },
-    { runner: 'bun', name: 'binary-search', start: 1, end: end, step: 0 },
+    // { runner: 'python', name: 'binary-search', start: 1, end: end, step: 0 },
+    // { runner: 'bun', name: 'binary-search', start: 1, end: end, step: 0 },
   
-    { runner: 'python', name: 'binary-search-prebuild', start: 1, end: end, step: 0 },
-    { runner: 'bun', name: 'binary-search-prebuild', start: 1, end: end, step: 0 },
+    // { runner: 'python', name: 'binary-search-prebuild', start: 1, end: end, step: 0 },
+    // { runner: 'bun', name: 'binary-search-prebuild', start: 1, end: end, step: 0 },
   
-    { runner: 'python', name: 'binary-search-prebuild-skip', start: 1, end: end, step: 0 },
-    { runner: 'bun', name: 'binary-search-prebuild-skip', start: 1, end: end, step: 0 },
+    // { runner: 'python', name: 'binary-search-prebuild-skip', start: 1, end: end, step: 0 },
+    // { runner: 'bun', name: 'binary-search-prebuild-skip', start: 1, end: end, step: 0 },
   
-    { runner: 'python', name: 'multithread', start: 1, end: end, step: end / 10 },
+    // { runner: 'python', name: 'multithread', start: 1, end: end, step: end / 10 },
     { runner: 'bun', name: 'multithread', start: 1, end: end, step: end / 10 },
 
-    { runner: 'bun', name: 'horizontal-binary-search', start: 1, end: end, step: end / 10 },
+    // { runner: 'bun', name: 'horizontal-binary-search', start: 1, end: end, step: end / 10 },
   ] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
 }
 
 const config = [
+  // ...makeTests(100),
+  // ...makeTests(1_000),
   // ...makeTests(10_000),
   // ...makeTests(100_000),
-  // ...makeTests(100_000),
+  // ...makeTests(1_000_000),
   // ...makeTests(1_000_000),
   // ...makeTests(10_000_000),
   // ...makeTests(100_000_000),
-    // ...makeTests(250_000_000),
-    // ...makeTests(500_000_000),
+  // ...makeTests(250_000_000),
+  // ...makeTests(500_000_000),
   // ...makeTests(1_000_000_000),
-  // { runner: 'bun', name: 'multithread-horizontal', start: 1, end: 10_000, step: 10_000 / 10 },
-  { runner: 'python', name: 'multithread', start: 1, end: 1_000_000_000, step: 100_000_000, timeout: 10 },
-  // { runner: 'bun', name: 'multithread', start: 1, end: 1_000_000_000, step: 100_000_000, timeout: 10 },
+  { runner: 'bun', name: 'multithread-horizontal', start: 1, end: 1_000_000, step: 10_000 / 10 },
+  // { runner: 'python', name: 'multithread', start: 1, end: 1_000_000_000, step: 100_000_000, timeout: 10 },
+  // { runner: 'bun', name: 'multithread', start: 1, end: 100_000_000, step: 10_000_000, timeout: 10 },
+  // { runner: 'bun', name: 'horizontal-binary-search', start: 1, end: 100, step: 100 / 10 },
 ] as { runner: 'python' | 'bun', name: string, start: number, end: number, step: number, timeout?: number }[]
 
 const run = async () => {
